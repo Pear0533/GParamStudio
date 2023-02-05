@@ -1,4 +1,7 @@
+using System.Diagnostics;
 using System.Globalization;
+using System.IO.Compression;
+using System.Net;
 using System.Numerics;
 using AngleAltitudeControls;
 using Cyotek.Windows.Forms;
@@ -11,21 +14,59 @@ namespace GParamStudio;
 public partial class GParamStudio : Form
 {
     private const string version = "1.07";
+    private const string updateZipUri = "https://flvereditor3.000webhostapp.com/update/GParamStudio.zip";
+    private const string updateVersionUri = "https://pastebin.com/raw/Kkp9LW8Z";
+    private const string updatePromptMessage = "A new version of GPARAM Studio is available, would you like to update?";
     private static GPARAM gparam = new();
     private static string gparamFileName = "";
+    private static readonly string? rootFolderPath = Path.GetDirectoryName(Application.ExecutablePath);
     private static bool isGParamFileOpen;
     private static readonly List<int[]> paramValueInfoList = new();
+    private static readonly string zipPath = $"{rootFolderPath}/GParamStudio.zip";
+    private static readonly string execPath = $"{rootFolderPath}/GParamStudio.exe";
+    private static readonly string updateFolderPath = $"{rootFolderPath}/update";
+    private static readonly string updateExecPath = $"{updateFolderPath}/GParamStudio.exe";
+    private static readonly string backupExecPath = $"{rootFolderPath}/GParamStudio.bak";
 
     public GParamStudio()
     {
         InitializeComponent();
-        SetVersionString();
+        CheckForUpdates();
         EnableDarkTheme();
     }
 
     private void SetVersionString()
     {
         versionStr.Text += $@" {version}";
+    }
+
+    public static DialogResult ShowQuestionDialog(string str)
+    {
+        return MessageBox.Show(str, @"Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+    }
+
+    private void CheckForUpdates()
+    {
+        SetVersionString();
+        try
+        {
+            var client = new WebClient();
+            if (client.DownloadString(updateVersionUri).Contains(version))
+            {
+                if (File.Exists(backupExecPath)) File.Delete(backupExecPath);
+                return;
+            }
+            if (ShowQuestionDialog(updatePromptMessage) != DialogResult.Yes) return;
+            client.DownloadFile(updateZipUri, zipPath);
+            ZipFile.ExtractToDirectory(zipPath, updateFolderPath, true);
+            if (File.Exists(zipPath)) File.Delete(zipPath);
+            File.Move(execPath, backupExecPath, true);
+            File.Copy(updateExecPath, execPath, true);
+            if (Directory.Exists(updateFolderPath)) Directory.Delete(updateFolderPath, true);
+            Process.Start(Application.ExecutablePath);
+            Environment.Exit(Environment.ExitCode);
+        }
+        catch { }
     }
 
     private static void ChangeTheme(Control control, Color backColor, Color foreColor)

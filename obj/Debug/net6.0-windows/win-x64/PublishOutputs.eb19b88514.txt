@@ -1,0 +1,7 @@
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\publish\win-x64\GParamStudio.pdb
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\publish\win-x64\icon.ico
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\publish\win-x64\bhd5_decrypt_rust.dll
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\publish\win-x64\oo2core_6_win64.dll
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\publish\win-x64\SoulsFormats.pdb
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\publish\win-x64\SoulsFormats.xml
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\publish\win-x64\GParamStudio.exe
