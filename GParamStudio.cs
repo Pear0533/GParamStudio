@@ -18,6 +18,7 @@ public partial class GParamStudio : Form
     private const string updateVersionUri = "https://pastebin.com/raw/Kkp9LW8Z";
     private const string updatePromptMessage = "A new version of GPARAM Studio is available, would you like to update?";
     private static GPARAM gparam = new();
+    private static TreeNode? prevSelectedNode;
     private static string gparamFileName = "";
     private static readonly string? rootFolderPath = Path.GetDirectoryName(Application.ExecutablePath);
     private static bool isGParamFileOpen;
@@ -91,6 +92,7 @@ public partial class GParamStudio : Form
 
     private void LoadParams()
     {
+        groupsBox.SaveTreeState();
         groupsBox.Nodes.Clear();
         paramsBox.Nodes.Clear();
         propertiesPanel.Controls.Clear();
@@ -126,6 +128,7 @@ public partial class GParamStudio : Form
             }
             groupsBox.Nodes.Add(groupNode);
         }
+        groupsBox.RestoreTreeState();
     }
 
     private void OpenToolStripMenuItemClick(object sender, EventArgs e)
@@ -158,6 +161,8 @@ public partial class GParamStudio : Form
 
     private void GroupsBoxAfterSelect(object sender, TreeViewEventArgs e)
     {
+        if (paramsBox.SelectedNode is { Parent: { } }) prevSelectedNode = paramsBox.SelectedNode.Parent;
+        paramsBox.SaveTreeState();
         paramsBox.Nodes.Clear();
         paramValueInfoList.Clear();
         propertiesPanel.Controls.Clear();
@@ -181,14 +186,9 @@ public partial class GParamStudio : Form
                             if (param.TimeOfDay == null) continue;
                             if (valueID != wantedValueID || !param.TimeOfDay[i].Equals(wantedTimeValue)) continue;
                             int shortNameIndex = param.Name1.IndexOf(param.Name2, StringComparison.Ordinal);
-                            TreeNode paramNode = new()
-                            {
-                                Text = shortNameIndex != -1 ? param.Name1[shortNameIndex..] : param.Name2
-                            };
-                            TreeNode valueNode = new()
-                            {
-                                Text = param.Values[i].ToString()
-                            };
+                            string paramNodeName = shortNameIndex != -1 ? param.Name1[shortNameIndex..] : param.Name2;
+                            TreeNode paramNode = new() { Name = paramNodeName, Text = paramNodeName };
+                            TreeNode valueNode = new() { Text = param.Values[i].ToString() };
                             paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), i });
                             paramNode.Nodes.Add(valueNode);
                             paramsBox.Nodes.Add(paramNode);
@@ -198,17 +198,18 @@ public partial class GParamStudio : Form
                 }
             }
         }
+        paramsBox.RestoreTreeState();
+        if (prevSelectedNode != null && prevSelectedNode.Nodes.Count > 0)
+        {
+            TreeNode? matchingParamNode = paramsBox.Nodes.Find(prevSelectedNode.Text, false).FirstOrDefault();
+            if (matchingParamNode != null) paramsBox.SelectedNode = paramsBox.Nodes[prevSelectedNode.Text].Nodes[0];
+        }
         if (isTimeNodeSelected && paramsBox.Nodes.Count > 0) return;
         paramsBox.Nodes.Clear();
         propertiesPanel.Controls.Clear();
         if (!isTimeNodeSelected)
-        {
             paramsBox.Nodes.Add(groupsBox.SelectedNode.Nodes.Count == 0 ? "There are no parameters for this group." : "Click the + button to expand the node.");
-        }
-        else
-        {
-            paramsBox.Nodes.Add("There are no parameters for this area and time of day.");
-        }
+        else paramsBox.Nodes.Add("There are no parameters for this area and time of day.");
     }
 
     private void ParamsBoxNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -476,11 +477,6 @@ public partial class GParamStudio : Form
         }
     }
 
-    private void ParamsBoxNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-    {
-        UpdateInteractiveControl(e.Node);
-    }
-
     private void ParamsBoxBeforeLabelEdit(object sender, NodeLabelEditEventArgs e)
     {
         if (e.Node.Parent == null) e.CancelEdit = true;
@@ -517,8 +513,6 @@ public partial class GParamStudio : Form
         TreeNode? hoveredNode = treeView.GetNodeAt(e.X, e.Y);
         return hoveredNode;
     }
-
-    // NOTE: RESTORE TREE VIEW STATE
 
     private void OnMapAreaIdNodeRightClick(TreeNode mapAreaIdNode)
     {
@@ -571,5 +565,17 @@ public partial class GParamStudio : Form
         TreeNode? paramNode = GetHoveredNodeOnRightClick(paramsBox, e);
         if (paramNode is not { Level: 0 }) return;
         ShowHoveredNodeRightClickMenu(paramNodeRightClickMenu, paramsBox, paramNode, (_, _) => OnParamNodeRightClick(paramNode), e);
+    }
+
+    private void ParamsBox_AfterSelect(object sender, TreeViewEventArgs e)
+    {
+        if (e.Node != null) UpdateInteractiveControl(e.Node);
+    }
+
+    private void ParamsBox_AfterExpand(object sender, TreeViewEventArgs e)
+    {
+        if (e.Node == null || e.Node.Nodes.Count <= 0) return;
+        UpdateInteractiveControl(e.Node.Nodes[0]);
+        paramsBox.SelectedNode = e.Node.Nodes[0];
     }
 }

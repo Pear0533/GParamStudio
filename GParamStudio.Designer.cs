@@ -1,4 +1,6 @@
-﻿namespace GParamStudio
+﻿using JRINCCustomControls;
+
+namespace GParamStudio
 {
     partial class GParamStudio
     {
@@ -39,10 +41,10 @@
             this.lightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.darkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupsParamsContainer = new System.Windows.Forms.SplitContainer();
-            this.groupsBox = new System.Windows.Forms.TreeView();
+            this.groupsBox = new JRINCCustomControls.customTreeView();
             this.label1 = new System.Windows.Forms.Label();
             this.paramsPropertiesContainer = new System.Windows.Forms.SplitContainer();
-            this.paramsBox = new System.Windows.Forms.TreeView();
+            this.paramsBox = new JRINCCustomControls.customTreeView();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.propertiesPanel = new System.Windows.Forms.Panel();
@@ -165,8 +167,10 @@
             this.groupsBox.ItemHeight = 25;
             this.groupsBox.Location = new System.Drawing.Point(4, 22);
             this.groupsBox.Name = "groupsBox";
+            this.groupsBox.PreseveTreeState = true;
             this.groupsBox.Size = new System.Drawing.Size(435, 403);
             this.groupsBox.TabIndex = 5;
+            this.groupsBox.TreeState_dic = ((System.Collections.Generic.Dictionary<string, bool>)(resources.GetObject("groupsBox.TreeState_dic")));
             this.groupsBox.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.GroupsBoxAfterSelect);
             this.groupsBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GroupsBoxParamIdNodeClick);
             // 
@@ -209,11 +213,14 @@
             this.paramsBox.ItemHeight = 25;
             this.paramsBox.Location = new System.Drawing.Point(3, 19);
             this.paramsBox.Name = "paramsBox";
+            this.paramsBox.PreseveTreeState = true;
             this.paramsBox.Size = new System.Drawing.Size(480, 182);
             this.paramsBox.TabIndex = 6;
+            this.paramsBox.TreeState_dic = ((System.Collections.Generic.Dictionary<string, bool>)(resources.GetObject("paramsBox.TreeState_dic")));
             this.paramsBox.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.ParamsBoxBeforeLabelEdit);
             this.paramsBox.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.ParamsBoxAfterLabelEdit);
-            this.paramsBox.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.ParamsBoxNodeMouseClick);
+            this.paramsBox.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.ParamsBox_AfterExpand);
+            this.paramsBox.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.ParamsBox_AfterSelect);
             this.paramsBox.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.ParamsBoxNodeMouseDoubleClick);
             this.paramsBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ParamsBox_MouseDown);
             // 
@@ -271,7 +278,7 @@
             this.copyrightInfoStr.TabIndex = 7;
             this.copyrightInfoStr.Text = "© Pear, 2023 All rights reserved.";
             // 
-            // paramIdNodeRightClickMenu
+            // mapAreaIdNodeRightClickMenu
             // 
             this.mapAreaIdNodeRightClickMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addNewTimeToolStripMenuItem});
@@ -297,17 +304,17 @@
             this.addNewParamToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.addNewParamToolStripMenuItem.Text = "Add New Param";
             // 
-            // paramsBoxDeleteParamRightClickMenu
+            // paramNodeRightClickMenu
             // 
             this.paramNodeRightClickMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.deleteParamToolStripMenuItem});
             this.paramNodeRightClickMenu.Name = "paramNodeRightClickMenu";
-            this.paramNodeRightClickMenu.Size = new System.Drawing.Size(181, 48);
+            this.paramNodeRightClickMenu.Size = new System.Drawing.Size(145, 26);
             // 
             // deleteParamToolStripMenuItem
             // 
             this.deleteParamToolStripMenuItem.Name = "deleteParamToolStripMenuItem";
-            this.deleteParamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteParamToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.deleteParamToolStripMenuItem.Text = "Delete Param";
             // 
             // GParamStudio
@@ -354,8 +361,7 @@
         private SplitContainer groupsParamsContainer;
         private Label label1;
         private Label label2;
-        private TreeView paramsBox;
-        private TreeView groupsBox;
+        private customTreeView groupsBox;
         private Label copyrightInfoStr;
         private ToolStripMenuItem themesToolStripMenuItem;
         private ToolStripMenuItem lightToolStripMenuItem;
@@ -372,5 +378,6 @@
         private ToolStripMenuItem addNewParamToolStripMenuItem;
         private ContextMenuStrip paramNodeRightClickMenu;
         private ToolStripMenuItem deleteParamToolStripMenuItem;
+        private customTreeView paramsBox;
     }
 }

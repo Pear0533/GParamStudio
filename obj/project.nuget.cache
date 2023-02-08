@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bz1L/RVFAF+U2Q7bDH0WMZiE4ibeeSC3C8XfwuteoYHtfiaY5M88zNcSQFkZwDOUGmsC9DbbHDk18PXl6J2Ajw==",
+  "dgSpecHash": "/Zc2J+CiaHF07eQM97N3jeFYl6MvyXH1eHeLqrvbyLEfGULBAuENRaTmWmgTU73ZO6a+DKiYlE4pMcTSLJpfdQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\GParamStudio\\GParamStudio.csproj",
+  "projectFilePath": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\GParamStudio\\GParamStudio.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Isaac Fisher\\.nuget\\packages\\cyotek.windows.forms.colorpicker\\1.7.2\\cyotek.windows.forms.colorpicker.1.7.2.nupkg.sha512"
   ],
@@ -11,7 +11,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'Cyotek.Windows.Forms.ColorPicker 1.7.2' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net6.0-windows7.0'. This package may not be fully compatible with your project.",
+      "message": "Package 'Cyotek.Windows.Forms.ColorPicker 1.7.2' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net6.0-windows7.0'. This package may not be fully compatible with your project.",
       "libraryId": "Cyotek.Windows.Forms.ColorPicker",
       "targetGraphs": [
         "net6.0-windows7.0"

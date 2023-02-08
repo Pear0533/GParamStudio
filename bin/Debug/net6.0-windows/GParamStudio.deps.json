@@ -10,6 +10,7 @@
         "dependencies": {
           "Cyotek.Windows.Forms.ColorPicker": "1.7.2",
           "AngleAltitudeControls": "1.0.0.0",
+          "JRINCCustomControls": "1.0.0.0",
           "memory": "1.0.0.0",
           "SoulsFormats": "1.0.0.0"
         },
@@ -28,6 +29,14 @@
       "AngleAltitudeControls/1.0.0.0": {
         "runtime": {
           "AngleAltitudeControls.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "JRINCCustomControls/1.0.0.0": {
+        "runtime": {
+          "JRINCCustomControls.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -65,6 +74,11 @@
       "hashPath": "cyotek.windows.forms.colorpicker.1.7.2.nupkg.sha512"
     },
     "AngleAltitudeControls/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "JRINCCustomControls/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

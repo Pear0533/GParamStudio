@@ -39,6 +39,9 @@
     <Reference Include="AngleAltitudeControls">
       <HintPath>AngleAltitudeControls.dll</HintPath>
     </Reference>
+    <Reference Include="JRINCCustomControls">
+      <HintPath>JRINCCustomControls.dll</HintPath>
+    </Reference>
     <Reference Include="memory">
       <HintPath>memory.dll</HintPath>
     </Reference>
