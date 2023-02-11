@@ -23,6 +23,7 @@ public partial class GParamStudio : Form
     private static readonly string? rootFolderPath = Path.GetDirectoryName(Application.ExecutablePath);
     private static bool isGParamFileOpen;
     private static readonly List<int[]> paramValueInfoList = new();
+    private static readonly List<GPARAM.Param> allParamsList = new();
     private static readonly string zipPath = $"{rootFolderPath}/GParamStudio.zip";
     private static readonly string execPath = $"{rootFolderPath}/GParamStudio.exe";
     private static readonly string updateFolderPath = $"{rootFolderPath}/update";
@@ -41,9 +42,57 @@ public partial class GParamStudio : Form
         versionStr.Text += $@" {version}";
     }
 
-    public static DialogResult ShowQuestionDialog(string str)
+    private static DialogResult ShowQuestionDialog(string str)
     {
         return MessageBox.Show(str, @"Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+    }
+
+    private int ShowAddParamDialog()
+    {
+        var form = new Form();
+        form.Text = @"Add New Param";
+        form.Icon = Icon;
+        form.Width = 500;
+        form.Height = 500;
+        form.MinimumSize = new Size(300, 300);
+        form.StartPosition = FormStartPosition.CenterScreen;
+        form.MaximizeBox = false;
+        var selectorBox = new TreeView();
+        selectorBox.Width = 450;
+        selectorBox.Height = 420;
+        selectorBox.Location = new Point(selectorBox.Location.X + 15, selectorBox.Location.Y + 5);
+        selectorBox.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
+        var cancelButton = new Button
+        {
+            Text = @"Cancel",
+            Size = new Size(65, 25),
+            Location = new Point(selectorBox.Width - 105,
+                selectorBox.Bottom + 5),
+            Anchor = AnchorStyles.Bottom | AnchorStyles.Right
+        };
+        var okButton = new Button
+        {
+            Text = @"OK",
+            Size = new Size(50, 25),
+            Location = new Point(selectorBox.Width - 35,
+                selectorBox.Bottom + 5),
+            Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+            DialogResult = DialogResult.OK
+        };
+
+        void CloseDialogHandler(object? s, EventArgs e)
+        {
+            form.Close();
+        }
+
+        cancelButton.Click += CloseDialogHandler;
+        okButton.Click += CloseDialogHandler;
+        form.AcceptButton = okButton;
+        form.Controls.Add(selectorBox);
+        form.Controls.Add(cancelButton);
+        form.Controls.Add(okButton);
+        foreach (GPARAM.Param param in allParamsList) selectorBox.Nodes.Add(new TreeNode(param.Name2));
+        return form.ShowDialog() == DialogResult.OK ? selectorBox.SelectedNode.Index : -1;
     }
 
     private void CheckForUpdates()
@@ -107,6 +156,7 @@ public partial class GParamStudio : Form
                 {
                     ids.AddRange(param.ValueIDs);
                     if (param.TimeOfDay != null) times.AddRange(param.TimeOfDay);
+                    if (allParamsList.All(i => i.Name2 != param.Name2)) allParamsList.Add(param);
                 }
                 ids = ids.Distinct().ToList();
                 times = times.Distinct().ToList();
@@ -509,12 +559,13 @@ public partial class GParamStudio : Form
 
     private static TreeNode? GetHoveredNodeOnRightClick(TreeView treeView, MouseEventArgs e)
     {
-        if (e.Button != MouseButtons.Right) return null;
         TreeNode? hoveredNode = treeView.GetNodeAt(e.X, e.Y);
-        return hoveredNode;
+        bool isMouseWithinNodeBounds = hoveredNode.Bounds.Contains(e.Location);
+        treeView.SelectedNode = isMouseWithinNodeBounds ? hoveredNode : null;
+        return isMouseWithinNodeBounds ? hoveredNode : null;
     }
 
-    private void OnMapAreaIdNodeRightClick(TreeNode mapAreaIdNode)
+    private void OnMapAreaIdNodeAddTimeOfDay(TreeNode mapAreaIdNode)
     {
         // NOTE: ELIMINATE REDUNDANT TIME NODES
         string timeOfDayStr = ShowInputDialog("Enter a time of day:", "Add Time");
@@ -531,7 +582,32 @@ public partial class GParamStudio : Form
         LoadParams();
     }
 
-    private void OnParamNodeRightClick(TreeNode paramNode)
+    private void OnParamsBoxAddNewParam()
+    {
+        int paramIndex = ShowAddParamDialog();
+        if (paramIndex == -1) return;
+        int[] valueInfo = GetValueInfoFromParamValInfoList(paramsBox.Nodes[0].Nodes[0]);
+        GPARAM.Group group = gparam.Groups[valueInfo[0]];
+        GPARAM.Param newParam = allParamsList[paramIndex];
+        var maxTimeOfDay = new List<float>();
+        var maxValueIDs = new List<int>();
+        foreach (GPARAM.Param param in group.Params)
+        {
+            if (param.TimeOfDay.Count > maxTimeOfDay.Count) maxTimeOfDay = param.TimeOfDay;
+            if (param.ValueIDs.Count > maxValueIDs.Count) maxValueIDs = param.ValueIDs;
+        }
+        newParam.TimeOfDay = maxTimeOfDay;
+        newParam.ValueIDs = maxValueIDs;
+        for (var i = 0; i < newParam.ValueIDs.Count; ++i)
+            if (i > newParam.Values.Count - 1)
+                newParam.Values.Add(newParam.Values[0]);
+        GPARAM.Param? existingParam = group.Params.FirstOrDefault(i => i.Name2 == newParam.Name2);
+        if (existingParam != null) gparam.Groups[valueInfo[0]].Params[group.Params.IndexOf(existingParam)] = newParam;
+        else gparam.Groups[valueInfo[0]].Params.Add(newParam);
+        LoadParams();
+    }
+
+    private void OnParamNodeDeleteParam(TreeNode paramNode)
     {
         // NOTE: RESTORE ORDER OF MAP AREA ID NODES
         DialogResult result = ShowQuestionDialog("Are you sure you want to delete this param?");
@@ -544,10 +620,9 @@ public partial class GParamStudio : Form
         LoadParams();
     }
 
-    private static void ShowHoveredNodeRightClickMenu(ToolStripDropDown rightClickMenu, TreeView treeView, TreeNode hoveredNode, ToolStripItemClickedEventHandler clickEvent,
+    private static void ShowRightClickMenu(ToolStripDropDown rightClickMenu, Control treeView, ToolStripItemClickedEventHandler clickEvent,
         MouseEventArgs e)
     {
-        treeView.SelectedNode = hoveredNode;
         rightClickMenu.Closed += (_, _) => { rightClickMenu.ItemClicked -= clickEvent; };
         rightClickMenu.ItemClicked += clickEvent;
         rightClickMenu.Show(treeView, e.X, e.Y);
@@ -555,16 +630,18 @@ public partial class GParamStudio : Form
 
     private void GroupsBoxParamIdNodeClick(object sender, MouseEventArgs e)
     {
+        if (e.Button != MouseButtons.Right) return;
         TreeNode? mapAreaIdNode = GetHoveredNodeOnRightClick(groupsBox, e);
         if (mapAreaIdNode is not { Level: 1 }) return;
-        ShowHoveredNodeRightClickMenu(mapAreaIdNodeRightClickMenu, groupsBox, mapAreaIdNode, (_, _) => OnMapAreaIdNodeRightClick(mapAreaIdNode), e);
+        ShowRightClickMenu(mapAreaIdNodeRightClickMenu, groupsBox, (_, _) => OnMapAreaIdNodeAddTimeOfDay(mapAreaIdNode), e);
     }
 
     private void ParamsBox_MouseDown(object sender, MouseEventArgs e)
     {
+        if (e.Button != MouseButtons.Right) return;
         TreeNode? paramNode = GetHoveredNodeOnRightClick(paramsBox, e);
-        if (paramNode is not { Level: 0 }) return;
-        ShowHoveredNodeRightClickMenu(paramNodeRightClickMenu, paramsBox, paramNode, (_, _) => OnParamNodeRightClick(paramNode), e);
+        if (paramNode is not { Level: 0 }) ShowRightClickMenu(paramsBoxAddParamRightClickMenu, paramsBox, (_, _) => OnParamsBoxAddNewParam(), e);
+        else ShowRightClickMenu(paramNodeRightClickMenu, paramsBox, (_, _) => OnParamNodeDeleteParam(paramNode), e);
     }
 
     private void ParamsBox_AfterSelect(object sender, TreeViewEventArgs e)
@@ -575,6 +652,7 @@ public partial class GParamStudio : Form
     private void ParamsBox_AfterExpand(object sender, TreeViewEventArgs e)
     {
         if (e.Node == null || e.Node.Nodes.Count <= 0) return;
+        if (prevSelectedNode != null && e.Node != prevSelectedNode) return;
         UpdateInteractiveControl(e.Node.Nodes[0]);
         paramsBox.SelectedNode = e.Node.Nodes[0];
     }
