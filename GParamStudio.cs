@@ -1,7 +1,4 @@
-using System.Diagnostics;
 using System.Globalization;
-using System.IO.Compression;
-using System.Net;
 using System.Numerics;
 using AngleAltitudeControls;
 using Cyotek.Windows.Forms;
@@ -13,27 +10,18 @@ namespace GParamStudio;
 
 public partial class GParamStudio : Form
 {
-    private const string version = "1.07";
-    private const string updateZipUri = "https://flvereditor3.000webhostapp.com/update/GParamStudio.zip";
-    private const string updateVersionUri = "https://pastebin.com/raw/Kkp9LW8Z";
-    private const string updatePromptMessage = "A new version of GPARAM Studio is available, would you like to update?";
+    private const string version = "1.08";
     private static GPARAM gparam = new();
     private static TreeNode? prevSelectedNode;
     private static string gparamFileName = "";
-    private static readonly string? rootFolderPath = Path.GetDirectoryName(Application.ExecutablePath);
     private static bool isGParamFileOpen;
     private static readonly List<int[]> paramValueInfoList = new();
     private static readonly List<GPARAM.Param> allParamsList = new();
-    private static readonly string zipPath = $"{rootFolderPath}/GParamStudio.zip";
-    private static readonly string execPath = $"{rootFolderPath}/GParamStudio.exe";
-    private static readonly string updateFolderPath = $"{rootFolderPath}/update";
-    private static readonly string updateExecPath = $"{updateFolderPath}/GParamStudio.exe";
-    private static readonly string backupExecPath = $"{rootFolderPath}/GParamStudio.bak";
 
     public GParamStudio()
     {
         InitializeComponent();
-        CheckForUpdates();
+        SetVersionString();
         EnableDarkTheme();
     }
 
@@ -93,30 +81,6 @@ public partial class GParamStudio : Form
         form.Controls.Add(okButton);
         foreach (GPARAM.Param param in allParamsList) selectorBox.Nodes.Add(new TreeNode(param.Name2));
         return form.ShowDialog() == DialogResult.OK ? selectorBox.SelectedNode.Index : -1;
-    }
-
-    private void CheckForUpdates()
-    {
-        SetVersionString();
-        try
-        {
-            var client = new WebClient();
-            if (client.DownloadString(updateVersionUri).Contains(version))
-            {
-                if (File.Exists(backupExecPath)) File.Delete(backupExecPath);
-                return;
-            }
-            if (ShowQuestionDialog(updatePromptMessage) != DialogResult.Yes) return;
-            client.DownloadFile(updateZipUri, zipPath);
-            ZipFile.ExtractToDirectory(zipPath, updateFolderPath, true);
-            if (File.Exists(zipPath)) File.Delete(zipPath);
-            File.Move(execPath, backupExecPath, true);
-            File.Copy(updateExecPath, execPath, true);
-            if (Directory.Exists(updateFolderPath)) Directory.Delete(updateFolderPath, true);
-            Process.Start(Application.ExecutablePath);
-            Environment.Exit(Environment.ExitCode);
-        }
-        catch { }
     }
 
     private static void ChangeTheme(Control control, Color backColor, Color foreColor)
@@ -567,7 +531,6 @@ public partial class GParamStudio : Form
 
     private void OnMapAreaIdNodeAddTimeOfDay(TreeNode mapAreaIdNode)
     {
-        // NOTE: ELIMINATE REDUNDANT TIME NODES
         string timeOfDayStr = ShowInputDialog("Enter a time of day:", "Add Time");
         if (timeOfDayStr == "") return;
         float.TryParse(timeOfDayStr, out float timeOfDay);
@@ -575,9 +538,10 @@ public partial class GParamStudio : Form
         if (paramList == null) return;
         foreach (GPARAM.Param param in paramList)
         {
-            param.TimeOfDay.Add(timeOfDay);
-            param.ValueIDs.Add(int.Parse(mapAreaIdNode.Name));
-            param.Values.Add(param.Values[^1]);
+            int newTimeOfDayInsertLoc = param.TimeOfDay.IndexOf(param.TimeOfDay.LastOrDefault(i => i < timeOfDay)) + 1;
+            param.TimeOfDay.Insert(newTimeOfDayInsertLoc, timeOfDay);
+            param.ValueIDs.Insert(newTimeOfDayInsertLoc, int.Parse(mapAreaIdNode.Name));
+            param.Values.Insert(newTimeOfDayInsertLoc, param.Values[^1]);
         }
         LoadParams();
     }
@@ -609,7 +573,6 @@ public partial class GParamStudio : Form
 
     private void OnParamNodeDeleteParam(TreeNode paramNode)
     {
-        // NOTE: RESTORE ORDER OF MAP AREA ID NODES
         DialogResult result = ShowQuestionDialog("Are you sure you want to delete this param?");
         if (result != DialogResult.Yes) return;
         int[] valueInfo = GetValueInfoFromParamValInfoList(paramNode.Nodes[0]);
