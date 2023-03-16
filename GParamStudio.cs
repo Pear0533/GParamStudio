@@ -21,6 +21,7 @@ public partial class GParamStudio : Form
     public GParamStudio()
     {
         InitializeComponent();
+        CenterToScreen();
         SetVersionString();
         EnableDarkTheme();
     }
@@ -145,7 +146,7 @@ public partial class GParamStudio : Form
         groupsBox.RestoreTreeState();
     }
 
-    private void OpenToolStripMenuItemClick(object sender, EventArgs e)
+    private void OpenGPARAMFile()
     {
         var dialog = new OpenFileDialog { Filter = @"GPARAM File (*.gparam.dcx, *.gparam)|*.gparam.dcx;*.gparam", Multiselect = false };
         if (dialog.ShowDialog() != DialogResult.OK) return;
@@ -155,12 +156,19 @@ public partial class GParamStudio : Form
         fileData = fileData.Take(64).Concat(new byte[4]).Concat(fileData.Skip(68)).ToArray();
         gparam = GPARAM.Read(fileData);
         isGParamFileOpen = true;
+        applyMassEditCheckbox.Enabled = true;
+        affectAllMapAreasCheckbox.Enabled = true;
         saveToolStripMenuItem.Visible = true;
         saveAsToolStripMenuItem.Visible = true;
         Program.window.Text = $@"{Program.windowTitle} - {Path.GetFileName(gparamFileName)}";
         groupsParamsContainer.Enabled = true;
         paramsBox.LabelEdit = true;
         LoadParams();
+    }
+
+    private void OpenToolStripMenuItemClick(object sender, EventArgs e)
+    {
+        OpenGPARAMFile();
     }
 
     private void LightToolStripMenuItemClick(object sender, EventArgs e)
@@ -318,6 +326,14 @@ public partial class GParamStudio : Form
         else if (fileName.EndsWith(".dcx")) File.WriteAllBytes(fileName, DCX.Compress(gparam.Write(), DCX.Type.DCX_KRAK));
     }
 
+    private static void SaveGPARAMFileAs()
+    {
+        var dialog = new SaveFileDialog
+            { Filter = @"GPARAM File (*.gparam)|*.gparam|BND File (*.gparam.dcx)|*.gparam.dcx", FileName = Path.GetFileNameWithoutExtension(gparamFileName) };
+        if (dialog.ShowDialog() != DialogResult.OK) return;
+        SaveGPARAMFile(dialog.FileName);
+    }
+
     private void SaveToolStripMenuItemClick(object sender, EventArgs e)
     {
         SaveGPARAMFile(gparamFileName);
@@ -325,10 +341,7 @@ public partial class GParamStudio : Form
 
     private void SaveAsToolStripMenuItemClick(object sender, EventArgs e)
     {
-        var dialog = new SaveFileDialog
-            { Filter = @"GPARAM File (*.gparam)|*.gparam|BND File (*.gparam.dcx)|*.gparam.dcx", FileName = Path.GetFileNameWithoutExtension(gparamFileName) };
-        if (dialog.ShowDialog() != DialogResult.OK) return;
-        SaveGPARAMFile(dialog.FileName);
+        SaveGPARAMFileAs();
     }
 
     private void GParamStudioFormClosing(object sender, FormClosingEventArgs e)
@@ -640,5 +653,24 @@ public partial class GParamStudio : Form
         if (prevSelectedNode != null && e.Node != prevSelectedNode) return;
         UpdateInteractiveControl(e.Node.Nodes[0]);
         paramsBox.SelectedNode = e.Node.Nodes[0];
+    }
+
+    private void GParamStudio_KeyDown(object sender, KeyEventArgs e)
+    {
+        switch (e.Control)
+        {
+            case true when e.KeyCode == Keys.O:
+                e.SuppressKeyPress = true;
+                OpenGPARAMFile();
+                break;
+            case true when !e.Shift && e.KeyCode == Keys.S:
+                e.SuppressKeyPress = true;
+                SaveGPARAMFile(gparamFileName);
+                break;
+            case true when e.Shift && e.KeyCode == Keys.S:
+                e.SuppressKeyPress = true;
+                SaveGPARAMFileAs();
+                break;
+        }
     }
 }
