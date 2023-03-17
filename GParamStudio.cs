@@ -10,7 +10,7 @@ namespace GParamStudio;
 
 public partial class GParamStudio : Form
 {
-    private const string version = "1.08";
+    private const string version = "1.09";
     private static GPARAM gparam = new();
     private static TreeNode? prevSelectedNode;
     private static string gparamFileName = "";
