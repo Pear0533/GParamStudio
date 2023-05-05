@@ -36,9 +36,14 @@ public partial class GParamStudio : Form
         return MessageBox.Show(str, @"Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
     }
 
+    private static DialogResult ShowInformationDialog(string str)
+    {
+        return MessageBox.Show(str, @"Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
     private int ShowAddParamDialog()
     {
-        var form = new Form();
+        Form? form = new();
         form.Text = @"Add New Param";
         form.Icon = Icon;
         form.Width = 500;
@@ -46,12 +51,12 @@ public partial class GParamStudio : Form
         form.MinimumSize = new Size(300, 300);
         form.StartPosition = FormStartPosition.CenterScreen;
         form.MaximizeBox = false;
-        var selectorBox = new TreeView();
+        TreeView selectorBox = new();
         selectorBox.Width = 450;
         selectorBox.Height = 420;
         selectorBox.Location = new Point(selectorBox.Location.X + 15, selectorBox.Location.Y + 5);
         selectorBox.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
-        var cancelButton = new Button
+        Button cancelButton = new()
         {
             Text = @"Cancel",
             Size = new Size(65, 25),
@@ -59,7 +64,7 @@ public partial class GParamStudio : Form
                 selectorBox.Bottom + 5),
             Anchor = AnchorStyles.Bottom | AnchorStyles.Right
         };
-        var okButton = new Button
+        Button okButton = new()
         {
             Text = @"OK",
             Size = new Size(50, 25),
@@ -112,7 +117,7 @@ public partial class GParamStudio : Form
         propertiesPanel.Controls.Clear();
         foreach (GPARAM.Group group in gparam.Groups)
         {
-            var groupNode = new TreeNode { Name = group.Name2, Text = group.Name2 };
+            TreeNode groupNode = new() { Name = group.Name2, Text = group.Name2 };
             if (group.Params.Count > 0)
             {
                 List<int> ids = new();
@@ -148,7 +153,7 @@ public partial class GParamStudio : Form
 
     private void OpenGPARAMFile()
     {
-        var dialog = new OpenFileDialog { Filter = @"GPARAM File (*.gparam.dcx, *.gparam)|*.gparam.dcx;*.gparam", Multiselect = false };
+        OpenFileDialog dialog = new() { Filter = @"GPARAM File (*.gparam.dcx, *.gparam)|*.gparam.dcx;*.gparam", Multiselect = false };
         if (dialog.ShowDialog() != DialogResult.OK) return;
         gparamFileName = dialog.FileName;
         byte[] fileData = File.ReadAllBytes(gparamFileName);
@@ -188,7 +193,7 @@ public partial class GParamStudio : Form
         paramsBox.Nodes.Clear();
         paramValueInfoList.Clear();
         propertiesPanel.Controls.Clear();
-        var isTimeNodeSelected = false;
+        bool isTimeNodeSelected = false;
         foreach (TreeNode groupNode in groupsBox.Nodes)
         {
             foreach (TreeNode idNode in groupNode.Nodes)
@@ -200,18 +205,20 @@ public partial class GParamStudio : Form
                     int wantedValueID = int.Parse(idNode.Name);
                     float wantedTimeValue = float.Parse(timeNode.Name);
                     GPARAM.Group group = gparam.Groups[groupNode.Index];
-                    foreach (GPARAM.Param param in group.Params)
+                    for (int i = 0; i < group.Params.Count; i++)
                     {
-                        for (var i = 0; i < param.ValueIDs.Count; ++i)
+                        GPARAM.Param param = group.Params[i];
+                        for (int j = 0; j < param.ValueIDs.Count; ++j)
                         {
-                            int valueID = param.ValueIDs[i];
+                            int valueID = param.ValueIDs[j];
                             if (param.TimeOfDay == null) continue;
-                            if (valueID != wantedValueID || !param.TimeOfDay[i].Equals(wantedTimeValue)) continue;
+                            if (valueID != wantedValueID || !param.TimeOfDay[j].Equals(wantedTimeValue)) continue;
                             int shortNameIndex = param.Name1.IndexOf(param.Name2, StringComparison.Ordinal);
                             string paramNodeName = shortNameIndex != -1 ? param.Name1[shortNameIndex..] : param.Name2;
-                            TreeNode paramNode = new() { Name = paramNodeName, Text = paramNodeName };
-                            TreeNode valueNode = new() { Text = param.Values[i].ToString() };
-                            paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), i });
+                            string paramComment = !string.IsNullOrEmpty(group.Comments.ElementAtOrDefault(i)) ? $" - {group.Comments.ElementAtOrDefault(i)}" : "";
+                            TreeNode paramNode = new() { Name = paramNodeName, Text = $@"{paramNodeName}{paramComment}" };
+                            TreeNode valueNode = new() { Text = param.Values[j].ToString() };
+                            paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), j });
                             paramNode.Nodes.Add(valueNode);
                             paramsBox.Nodes.Add(paramNode);
                             break;
@@ -278,7 +285,7 @@ public partial class GParamStudio : Form
         if (applyMassEditCheckbox.Checked)
         {
             int mapAreaId = gparam.Groups[valueInfo[0]].Params[valueInfo[1]].ValueIDs[valueInfo[2]];
-            for (var i = 0; i < gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values.Count; i++)
+            for (int i = 0; i < gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values.Count; i++)
             {
                 if (affectAllMapAreasCheckbox.Checked
                     || gparam.Groups[valueInfo[0]].Params[valueInfo[1]].ValueIDs[i] == mapAreaId)
@@ -328,8 +335,7 @@ public partial class GParamStudio : Form
 
     private static void SaveGPARAMFileAs()
     {
-        var dialog = new SaveFileDialog
-            { Filter = @"GPARAM File (*.gparam)|*.gparam|BND File (*.gparam.dcx)|*.gparam.dcx", FileName = Path.GetFileNameWithoutExtension(gparamFileName) };
+        SaveFileDialog dialog = new() { Filter = @"GPARAM File (*.gparam)|*.gparam|BND File (*.gparam.dcx)|*.gparam.dcx", FileName = Path.GetFileNameWithoutExtension(gparamFileName) };
         if (dialog.ShowDialog() != DialogResult.OK) return;
         SaveGPARAMFile(dialog.FileName);
     }
@@ -371,7 +377,7 @@ public partial class GParamStudio : Form
 
     private static NumericUpDown CreateNumBoxWithSetValue(decimal value, decimal increment)
     {
-        var numBox = new NumericUpDown
+        NumericUpDown numBox = new()
         {
             Size = new Size(120, 30),
             Increment = increment,
@@ -410,7 +416,7 @@ public partial class GParamStudio : Form
             case GPARAM.ParamType.Float2:
                 int angleValue = ToDegrees(values[0]);
                 int altitudeValue = ToDegrees(values[1]);
-                var angleSelector = new AngleAltitudeSelector
+                AngleAltitudeSelector angleSelector = new()
                 {
                     Dock = DockStyle.Fill,
                     Angle = angleValue,
@@ -421,7 +427,7 @@ public partial class GParamStudio : Form
 
                 void AngleSelectorValueChanged()
                 {
-                    var angle = new Vector2(ToRadians(angleSelector.Angle), ToRadians(angleSelector.Altitude));
+                    Vector2 angle = new(ToRadians(angleSelector.Angle), ToRadians(angleSelector.Altitude));
                     angleBox.Value = angleSelector.Angle;
                     altitudeBox.Value = angleSelector.Altitude;
                     UpdateParamValueInfo(valueInfo, angle);
@@ -432,26 +438,26 @@ public partial class GParamStudio : Form
                 angleSelector.AltitudeChanged += AngleSelectorValueChanged;
                 angleBox.ValueChanged += (_, _) => { angleSelector.Angle = (int)angleBox.Value; };
                 altitudeBox.ValueChanged += (_, _) => { angleSelector.Altitude = (int)altitudeBox.Value; };
-                var numBoxesContainer = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown };
+                FlowLayoutPanel numBoxesContainer = new() { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown };
                 numBoxesContainer.Controls.Add(angleBox);
                 numBoxesContainer.Controls.Add(altitudeBox);
-                var angleControlContainer = new SplitContainer { Dock = DockStyle.Fill };
+                SplitContainer angleControlContainer = new() { Dock = DockStyle.Fill };
                 angleControlContainer.Panel1.Controls.Add(angleSelector);
                 angleControlContainer.Panel2.Controls.Add(numBoxesContainer);
                 propertiesPanel.Controls.Add(angleControlContainer);
                 break;
             case GPARAM.ParamType.Float4:
-                var wheel = new ColorWheel
+                ColorWheel wheel = new()
                 {
                     Dock = DockStyle.Fill,
                     Color = Color.FromArgb(
                         255, (int)(values[0] * 255), (int)(values[1] * 255), (int)(values[2] * 255))
                 };
-                var editor = new ColorEditor { Dock = DockStyle.Fill, Color = wheel.Color };
+                ColorEditor editor = new() { Dock = DockStyle.Fill, Color = wheel.Color };
                 wheel.ColorChanged += (_, _) =>
                 {
                     Color color = wheel.Color;
-                    var colorObj = new Vector4((float)(color.R / 255.0), (float)(color.G / 255.0), (float)(color.B / 255.0), values[3]);
+                    Vector4 colorObj = new((float)(color.R / 255.0), (float)(color.G / 255.0), (float)(color.B / 255.0), values[3]);
                     editor.Color = wheel.Color;
                     UpdateParamValueInfo(valueInfo, colorObj);
                     node.Text = colorObj.ToString();
@@ -464,14 +470,14 @@ public partial class GParamStudio : Form
                         if (e.KeyCode == Keys.Enter) e.SuppressKeyPress = true;
                     };
                 }
-                var colorControlContainer = new SplitContainer { Dock = DockStyle.Fill };
+                SplitContainer colorControlContainer = new() { Dock = DockStyle.Fill };
                 colorControlContainer.Panel1.Controls.Add(wheel);
                 colorControlContainer.Panel2.Controls.Add(editor);
                 propertiesPanel.Controls.Add(colorControlContainer);
                 break;
             case GPARAM.ParamType.BoolA:
             case GPARAM.ParamType.BoolB:
-                var checkbox = new CheckBox { Size = propertiesPanel.Size with { Height = 30 }, Text = param.Name2, Checked = bool.Parse(value) };
+                CheckBox checkbox = new() { Size = propertiesPanel.Size with { Height = 30 }, Text = param.Name2, Checked = bool.Parse(value) };
                 checkbox.CheckStateChanged += (_, _) =>
                 {
                     UpdateParamValueInfo(valueInfo, checkbox.Checked);
@@ -533,7 +539,7 @@ public partial class GParamStudio : Form
 
     private static string ShowInputDialog(string text, string caption)
     {
-        var prompt = new Form
+        Form prompt = new()
         {
             Width = 240,
             Height = 125,
@@ -542,11 +548,11 @@ public partial class GParamStudio : Form
             StartPosition = FormStartPosition.CenterScreen,
             MaximizeBox = false
         };
-        var textLabel = new Label { Left = 8, Top = 8, Width = 200, Text = text };
-        var textBox = new TextBox { Left = 10, Top = 28, Width = 200 };
-        var cancelButton = new Button { Text = @"Cancel", Left = 9, Width = 100, Top = 55, DialogResult = DialogResult.Cancel };
+        Label textLabel = new() { Left = 8, Top = 8, Width = 200, Text = text };
+        TextBox textBox = new() { Left = 10, Top = 28, Width = 200 };
+        Button cancelButton = new() { Text = @"Cancel", Left = 9, Width = 100, Top = 55, DialogResult = DialogResult.Cancel };
         cancelButton.Click += (_, _) => { prompt.Close(); };
-        var confirmation = new Button { Text = @"OK", Left = 112, Width = 100, Top = 55, DialogResult = DialogResult.OK };
+        Button confirmation = new() { Text = @"OK", Left = 112, Width = 100, Top = 55, DialogResult = DialogResult.OK };
         confirmation.Click += (_, _) => { prompt.Close(); };
         prompt.Controls.Add(textBox);
         prompt.Controls.Add(cancelButton);
@@ -588,8 +594,8 @@ public partial class GParamStudio : Form
         int[] valueInfo = GetValueInfoFromParamValInfoList(paramsBox.Nodes[0].Nodes[0]);
         GPARAM.Group group = gparam.Groups[valueInfo[0]];
         GPARAM.Param newParam = allParamsList[paramIndex];
-        var maxTimeOfDay = new List<float>();
-        var maxValueIDs = new List<int>();
+        List<float>? maxTimeOfDay = new();
+        List<int>? maxValueIDs = new();
         foreach (GPARAM.Param param in group.Params)
         {
             if (param.TimeOfDay.Count > maxTimeOfDay.Count) maxTimeOfDay = param.TimeOfDay;
@@ -597,12 +603,25 @@ public partial class GParamStudio : Form
         }
         newParam.TimeOfDay = maxTimeOfDay;
         newParam.ValueIDs = maxValueIDs;
-        for (var i = 0; i < newParam.ValueIDs.Count; ++i)
+        for (int i = 0; i < newParam.ValueIDs.Count; ++i)
             if (i > newParam.Values.Count - 1)
                 newParam.Values.Add(newParam.Values[0]);
         GPARAM.Param? existingParam = group.Params.FirstOrDefault(i => i.Name2 == newParam.Name2);
         if (existingParam != null) gparam.Groups[valueInfo[0]].Params[group.Params.IndexOf(existingParam)] = newParam;
         else gparam.Groups[valueInfo[0]].Params.Add(newParam);
+        LoadParams();
+    }
+
+    private void OnParamNodeAssignComment(TreeNode paramNode)
+    {
+        string comment = ShowInputDialog("Enter a comment:", "Assign Comment");
+        if (string.IsNullOrEmpty(comment))
+        {
+            ShowInformationDialog("The comment cannot be empty.");
+            return;
+        }
+        int[] valueInfo = GetValueInfoFromParamValInfoList(paramNode.Nodes[0]);
+        gparam.Groups[valueInfo[0]].Comments[valueInfo[1]] = comment;
         LoadParams();
     }
 
@@ -639,7 +658,22 @@ public partial class GParamStudio : Form
         if (e.Button != MouseButtons.Right) return;
         TreeNode? paramNode = GetHoveredNodeOnRightClick(paramsBox, e);
         if (paramNode is not { Level: 0 }) ShowRightClickMenu(paramsBoxAddParamRightClickMenu, paramsBox, (_, _) => OnParamsBoxAddNewParam(), e);
-        else ShowRightClickMenu(paramNodeRightClickMenu, paramsBox, (_, _) => OnParamNodeDeleteParam(paramNode), e);
+        else
+        {
+            ShowRightClickMenu(paramNodeRightClickMenu, paramsBox, (_, clickEventArgs) =>
+            {
+                int selectedOptionIndex = paramNodeRightClickMenu.Items.IndexOf(clickEventArgs.ClickedItem);
+                switch (selectedOptionIndex)
+                {
+                    case 0:
+                        OnParamNodeDeleteParam(paramNode);
+                        break;
+                    case 1:
+                        OnParamNodeAssignComment(paramNode);
+                        break;
+                }
+            }, e);
+        }
     }
 
     private void ParamsBox_AfterSelect(object sender, TreeViewEventArgs e)

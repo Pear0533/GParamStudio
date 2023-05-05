@@ -58,6 +58,7 @@ namespace GParamStudio
             addNewParamToolStripMenuItem = new ToolStripMenuItem();
             paramNodeRightClickMenu = new ContextMenuStrip(components);
             deleteParamToolStripMenuItem = new ToolStripMenuItem();
+            changeCommentToolStripMenuItem = new ToolStripMenuItem();
             ribbon.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)groupsParamsContainer).BeginInit();
             groupsParamsContainer.Panel1.SuspendLayout();
@@ -309,15 +310,21 @@ namespace GParamStudio
             // 
             // paramNodeRightClickMenu
             // 
-            paramNodeRightClickMenu.Items.AddRange(new ToolStripItem[] { deleteParamToolStripMenuItem });
+            paramNodeRightClickMenu.Items.AddRange(new ToolStripItem[] { deleteParamToolStripMenuItem, changeCommentToolStripMenuItem });
             paramNodeRightClickMenu.Name = "paramNodeRightClickMenu";
-            paramNodeRightClickMenu.Size = new Size(145, 26);
+            paramNodeRightClickMenu.Size = new Size(167, 48);
             // 
             // deleteParamToolStripMenuItem
             // 
             deleteParamToolStripMenuItem.Name = "deleteParamToolStripMenuItem";
-            deleteParamToolStripMenuItem.Size = new Size(144, 22);
+            deleteParamToolStripMenuItem.Size = new Size(172, 22);
             deleteParamToolStripMenuItem.Text = "Delete Param";
+            // 
+            // changeCommentToolStripMenuItem
+            // 
+            changeCommentToolStripMenuItem.Name = "changeCommentToolStripMenuItem";
+            changeCommentToolStripMenuItem.Size = new Size(166, 22);
+            changeCommentToolStripMenuItem.Text = "Assign Comment";
             // 
             // GParamStudio
             // 
@@ -386,5 +393,6 @@ namespace GParamStudio
         private ContextMenuStrip paramNodeRightClickMenu;
         private ToolStripMenuItem deleteParamToolStripMenuItem;
         private customTreeView paramsBox;
+        private ToolStripMenuItem changeCommentToolStripMenuItem;
     }
 }
