@@ -42,6 +42,7 @@ namespace GParamStudio
             darkToolStripMenuItem = new ToolStripMenuItem();
             groupsParamsContainer = new SplitContainer();
             groupsBox = new customTreeView();
+            groupNodeColors = new ImageList(components);
             label1 = new Label();
             paramsPropertiesContainer = new SplitContainer();
             paramsBox = new customTreeView();
@@ -156,15 +157,24 @@ namespace GParamStudio
             // groupsBox
             // 
             groupsBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            groupsBox.ImageIndex = 0;
+            groupsBox.ImageList = groupNodeColors;
             groupsBox.ItemHeight = 25;
             groupsBox.Location = new Point(4, 22);
             groupsBox.Name = "groupsBox";
             groupsBox.PreseveTreeState = true;
+            groupsBox.SelectedImageIndex = 0;
             groupsBox.Size = new Size(435, 403);
             groupsBox.TabIndex = 5;
             groupsBox.TreeState_dic = null;
             groupsBox.AfterSelect += GroupsBoxAfterSelect;
             groupsBox.MouseDown += GroupsBoxParamIdNodeClick;
+            // 
+            // groupNodeColors
+            // 
+            groupNodeColors.ColorDepth = ColorDepth.Depth8Bit;
+            groupNodeColors.ImageSize = new Size(16, 16);
+            groupNodeColors.TransparentColor = Color.Transparent;
             // 
             // label1
             // 
@@ -317,7 +327,7 @@ namespace GParamStudio
             // deleteParamToolStripMenuItem
             // 
             deleteParamToolStripMenuItem.Name = "deleteParamToolStripMenuItem";
-            deleteParamToolStripMenuItem.Size = new Size(172, 22);
+            deleteParamToolStripMenuItem.Size = new Size(166, 22);
             deleteParamToolStripMenuItem.Text = "Delete Param";
             // 
             // changeCommentToolStripMenuItem
@@ -394,5 +404,6 @@ namespace GParamStudio
         private ToolStripMenuItem deleteParamToolStripMenuItem;
         private customTreeView paramsBox;
         private ToolStripMenuItem changeCommentToolStripMenuItem;
+        private ImageList groupNodeColors;
     }
 }

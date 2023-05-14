@@ -31,14 +31,32 @@ public partial class GParamStudio : Form
         versionStr.Text += $@" {version}";
     }
 
+    private void PopulateGroupNodeColors()
+    {
+        groupNodeColors.Images.Clear();
+        for (int i = 0; i < gparam.Groups.Count; ++i)
+        {
+            Random randomColorGenerator = new();
+            Bitmap colorBitmap = new(16, 16);
+            int r = randomColorGenerator.Next(256);
+            int g = randomColorGenerator.Next(256);
+            int b = randomColorGenerator.Next(256);
+            Color rgb = Color.FromArgb(r, g, b);
+            for (int y = 0; y < colorBitmap.Height; ++y)
+            for (int x = 0; x < colorBitmap.Width; ++x)
+                colorBitmap.SetPixel(x, y, rgb);
+            groupNodeColors.Images.Add(colorBitmap);
+        }
+    }
+
     private static DialogResult ShowQuestionDialog(string str)
     {
         return MessageBox.Show(str, @"Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
     }
 
-    private static DialogResult ShowInformationDialog(string str)
+    private static void ShowInformationDialog(string str)
     {
-        return MessageBox.Show(str, @"Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        MessageBox.Show(str, @"Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
     private int ShowAddParamDialog()
@@ -117,7 +135,8 @@ public partial class GParamStudio : Form
         propertiesPanel.Controls.Clear();
         foreach (GPARAM.Group group in gparam.Groups)
         {
-            TreeNode groupNode = new() { Name = group.Name2, Text = group.Name2 };
+            int imageIndex = gparam.Groups.IndexOf(group);
+            TreeNode groupNode = new() { Name = group.Name2, Text = group.Name2, ImageIndex = imageIndex, SelectedImageIndex = imageIndex };
             if (group.Params.Count > 0)
             {
                 List<int> ids = new();
@@ -130,7 +149,11 @@ public partial class GParamStudio : Form
                 }
                 ids = ids.Distinct().ToList();
                 times = times.Distinct().ToList();
-                foreach (TreeNode? idNode in ids.Select(id => new TreeNode { Text = $@"• ID: {id}", Name = id.ToString() }))
+                foreach (TreeNode? idNode in ids.Select(id => new TreeNode
+                         {
+                             Text = $@"• ID: {id}", Name = id.ToString(),
+                             ImageIndex = groupNodeColors.Images.Count, SelectedImageIndex = groupNodeColors.Images.Count
+                         }))
                 {
                     const float baseTime = 0;
                     foreach (TreeNode timeNode in from time in times
@@ -138,7 +161,8 @@ public partial class GParamStudio : Form
                              select new TreeNode
                              {
                                  Text = $@"• {newTime.ToString("h:mm tt", CultureInfo.InvariantCulture)}",
-                                 Name = time.ToString(CultureInfo.InvariantCulture)
+                                 Name = time.ToString(CultureInfo.InvariantCulture),
+                                 ImageIndex = groupNodeColors.Images.Count, SelectedImageIndex = groupNodeColors.Images.Count
                              })
                     {
                         idNode.Nodes.Add(timeNode);
@@ -168,6 +192,7 @@ public partial class GParamStudio : Form
         Program.window.Text = $@"{Program.windowTitle} - {Path.GetFileName(gparamFileName)}";
         groupsParamsContainer.Enabled = true;
         paramsBox.LabelEdit = true;
+        PopulateGroupNodeColors();
         LoadParams();
     }
 
@@ -335,7 +360,8 @@ public partial class GParamStudio : Form
 
     private static void SaveGPARAMFileAs()
     {
-        SaveFileDialog dialog = new() { Filter = @"GPARAM File (*.gparam)|*.gparam|BND File (*.gparam.dcx)|*.gparam.dcx", FileName = Path.GetFileNameWithoutExtension(gparamFileName) };
+        SaveFileDialog dialog = new()
+            { Filter = @"GPARAM File (*.gparam)|*.gparam|BND File (*.gparam.dcx)|*.gparam.dcx", FileName = Path.GetFileNameWithoutExtension(gparamFileName) };
         if (dialog.ShowDialog() != DialogResult.OK) return;
         SaveGPARAMFile(dialog.FileName);
     }
