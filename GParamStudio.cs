@@ -3,6 +3,7 @@ using System.Numerics;
 using AngleAltitudeControls;
 using Cyotek.Windows.Forms;
 using SoulsFormats;
+using GPARAM = WitchyFormats.GPARAM;
 
 #pragma warning disable SYSLIB0014
 
@@ -144,7 +145,7 @@ public partial class GParamStudio : Form
                 foreach (GPARAM.Param param in group.Params)
                 {
                     ids.AddRange(param.ValueIDs);
-                    if (param.TimeOfDay != null) times.AddRange(param.TimeOfDay);
+                    times.AddRange(param.TimeOfDay);
                     if (allParamsList.All(i => i.Name2 != param.Name2)) allParamsList.Add(param);
                 }
                 ids = ids.Distinct().ToList();
@@ -620,8 +621,8 @@ public partial class GParamStudio : Form
         int[] valueInfo = GetValueInfoFromParamValInfoList(paramsBox.Nodes[0].Nodes[0]);
         GPARAM.Group group = gparam.Groups[valueInfo[0]];
         GPARAM.Param newParam = allParamsList[paramIndex];
-        List<float>? maxTimeOfDay = new();
-        List<int>? maxValueIDs = new();
+        List<float> maxTimeOfDay = new();
+        List<int> maxValueIDs = new();
         foreach (GPARAM.Param param in group.Params)
         {
             if (param.TimeOfDay.Count > maxTimeOfDay.Count) maxTimeOfDay = param.TimeOfDay;
