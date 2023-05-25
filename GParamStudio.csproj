@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Cyotek.Windows.Forms.ColorPicker" Version="1.7.2" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +48,9 @@
     </Reference>
     <Reference Include="SoulsFormats">
       <HintPath>SoulsFormats.dll</HintPath>
+    </Reference>
+    <Reference Include="WitchyFormats">
+      <HintPath>WitchyFormats.dll</HintPath>
     </Reference>
   </ItemGroup>
 

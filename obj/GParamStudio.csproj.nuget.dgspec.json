@@ -46,6 +46,10 @@
             "Cyotek.Windows.Forms.ColorPicker": {
               "target": "Package",
               "version": "[1.7.2, )"
+            },
+            "System.Text.Encoding.CodePages": {
+              "target": "Package",
+              "version": "[7.0.0, )"
             }
           },
           "imports": [
