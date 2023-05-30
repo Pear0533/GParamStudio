@@ -62,6 +62,8 @@ namespace GParamStudio
             changeCommentToolStripMenuItem = new ToolStripMenuItem();
             groupNodeRightClickMenu = new ContextMenuStrip(components);
             assignCommentToolStripMenuItem = new ToolStripMenuItem();
+            clearCommentToolStripMenuItem = new ToolStripMenuItem();
+            clearCommentToolStripMenuItem1 = new ToolStripMenuItem();
             ribbon.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)groupsParamsContainer).BeginInit();
             groupsParamsContainer.Panel1.SuspendLayout();
@@ -323,9 +325,9 @@ namespace GParamStudio
             // 
             // paramNodeRightClickMenu
             // 
-            paramNodeRightClickMenu.Items.AddRange(new ToolStripItem[] { deleteParamToolStripMenuItem, changeCommentToolStripMenuItem });
+            paramNodeRightClickMenu.Items.AddRange(new ToolStripItem[] { deleteParamToolStripMenuItem, changeCommentToolStripMenuItem, clearCommentToolStripMenuItem1 });
             paramNodeRightClickMenu.Name = "paramNodeRightClickMenu";
-            paramNodeRightClickMenu.Size = new Size(167, 48);
+            paramNodeRightClickMenu.Size = new Size(167, 70);
             // 
             // deleteParamToolStripMenuItem
             // 
@@ -341,15 +343,27 @@ namespace GParamStudio
             // 
             // groupNodeRightClickMenu
             // 
-            groupNodeRightClickMenu.Items.AddRange(new ToolStripItem[] { assignCommentToolStripMenuItem });
+            groupNodeRightClickMenu.Items.AddRange(new ToolStripItem[] { assignCommentToolStripMenuItem, clearCommentToolStripMenuItem });
             groupNodeRightClickMenu.Name = "groupNodeRightClickMenu";
-            groupNodeRightClickMenu.Size = new Size(167, 26);
+            groupNodeRightClickMenu.Size = new Size(167, 48);
             // 
             // assignCommentToolStripMenuItem
             // 
             assignCommentToolStripMenuItem.Name = "assignCommentToolStripMenuItem";
             assignCommentToolStripMenuItem.Size = new Size(166, 22);
             assignCommentToolStripMenuItem.Text = "Assign Comment";
+            // 
+            // clearCommentToolStripMenuItem
+            // 
+            clearCommentToolStripMenuItem.Name = "clearCommentToolStripMenuItem";
+            clearCommentToolStripMenuItem.Size = new Size(166, 22);
+            clearCommentToolStripMenuItem.Text = "Clear Comment";
+            // 
+            // clearCommentToolStripMenuItem1
+            // 
+            clearCommentToolStripMenuItem1.Name = "clearCommentToolStripMenuItem1";
+            clearCommentToolStripMenuItem1.Size = new Size(166, 22);
+            clearCommentToolStripMenuItem1.Text = "Clear Comment";
             // 
             // GParamStudio
             // 
@@ -423,5 +437,7 @@ namespace GParamStudio
         private ImageList groupNodeColors;
         private ContextMenuStrip groupNodeRightClickMenu;
         private ToolStripMenuItem assignCommentToolStripMenuItem;
+        private ToolStripMenuItem clearCommentToolStripMenuItem;
+        private ToolStripMenuItem clearCommentToolStripMenuItem1;
     }
 }

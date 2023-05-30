@@ -621,13 +621,23 @@ public partial class GParamStudio : Form
         File.WriteAllText(commentsJsonFilePath, JsonConvert.SerializeObject(commentsJson, Formatting.Indented));
     }
 
+    private void AddOverrideGroupComment(string groupName, string comment)
+    {
+        commentsJson[groupName] = comment;
+        WriteCommentsJson();
+        LoadParams();
+    }
+
     private void OnGroupNodeAssignComment(string groupName)
     {
         string? comment = ShowCommentDialog();
         if (comment == null) return;
-        commentsJson[groupName] = comment;
-        WriteCommentsJson();
-        LoadParams();
+        AddOverrideGroupComment(groupName, comment);
+    }
+
+    private void OnGroupNodeClearComment(string groupName)
+    {
+        AddOverrideGroupComment(groupName, "");
     }
 
     private void OnMapAreaIdNodeAddTimeOfDay(TreeNode mapAreaIdNode)
@@ -678,13 +688,23 @@ public partial class GParamStudio : Form
         return string.IsNullOrEmpty(comment) ? null : comment;
     }
 
+    private void AddOverrideParamComment(TreeNode paramNode, string comment)
+    {
+        int[] valueInfo = GetValueInfoFromParamValInfoList(paramNode.Nodes[0]);
+        gparam.Groups[valueInfo[0]].Comments[valueInfo[1]] = comment;
+        LoadParams();
+    }
+
     private void OnParamNodeAssignComment(TreeNode paramNode)
     {
         string? comment = ShowCommentDialog();
         if (comment == null) return;
-        int[] valueInfo = GetValueInfoFromParamValInfoList(paramNode.Nodes[0]);
-        gparam.Groups[valueInfo[0]].Comments[valueInfo[1]] = comment;
-        LoadParams();
+        AddOverrideParamComment(paramNode, comment);
+    }
+
+    private void OnParamNodeClearComment(TreeNode paramNode)
+    {
+        AddOverrideParamComment(paramNode, "");
     }
 
     private void OnParamNodeDeleteParam(TreeNode paramNode)
@@ -707,6 +727,11 @@ public partial class GParamStudio : Form
         rightClickMenu.Show(treeView, e.X, e.Y);
     }
 
+    private static int GetSelectedOptionIndex(ToolStrip contextMenu, ToolStripItemClickedEventArgs args)
+    {
+        return contextMenu.Items.IndexOf(args.ClickedItem);
+    }
+
     private void GroupsBoxRightClick(object sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Right) return;
@@ -714,7 +739,18 @@ public partial class GParamStudio : Form
         switch (treeNode)
         {
             case { Level: 0 }:
-                ShowRightClickMenu(groupNodeRightClickMenu, groupsBox, (_, _) => OnGroupNodeAssignComment(treeNode.Name), e);
+                ShowRightClickMenu(groupNodeRightClickMenu, groupsBox, (_, args) =>
+                {
+                    switch (GetSelectedOptionIndex(groupNodeRightClickMenu, args))
+                    {
+                        case 0:
+                            OnGroupNodeAssignComment(treeNode.Name);
+                            break;
+                        case 1:
+                            OnGroupNodeClearComment(treeNode.Name);
+                            break;
+                    }
+                }, e);
                 break;
             case { Level: 1 }:
                 ShowRightClickMenu(mapAreaIdNodeRightClickMenu, groupsBox, (_, _) => OnMapAreaIdNodeAddTimeOfDay(treeNode), e);
@@ -728,16 +764,18 @@ public partial class GParamStudio : Form
         TreeNode? paramNode = GetHoveredNodeOnRightClick(paramsBox, e);
         if (paramNode is { Level: 0 })
         {
-            ShowRightClickMenu(paramNodeRightClickMenu, paramsBox, (_, clickEventArgs) =>
+            ShowRightClickMenu(paramNodeRightClickMenu, paramsBox, (_, args) =>
             {
-                int selectedOptionIndex = paramNodeRightClickMenu.Items.IndexOf(clickEventArgs.ClickedItem);
-                switch (selectedOptionIndex)
+                switch (GetSelectedOptionIndex(paramNodeRightClickMenu, args))
                 {
                     case 0:
                         OnParamNodeDeleteParam(paramNode);
                         break;
                     case 1:
                         OnParamNodeAssignComment(paramNode);
+                        break;
+                    case 2:
+                        OnParamNodeClearComment(paramNode);
                         break;
                 }
             }, e);
