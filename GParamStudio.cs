@@ -1,7 +1,10 @@
 using System.Globalization;
 using System.Numerics;
+using System.Reflection;
 using AngleAltitudeControls;
 using Cyotek.Windows.Forms;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SoulsFormats;
 using GPARAM = WitchyFormats.GPARAM;
 
@@ -15,6 +18,9 @@ public partial class GParamStudio : Form
     private static GPARAM gparam = new();
     private static TreeNode? prevSelectedNode;
     private static string gparamFileName = "";
+    private static readonly string? rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    private static readonly string commentsJsonFilePath = $"{rootPath}\\groupcomments.json";
+    private static JObject commentsJson = new();
     private static bool isGParamFileOpen;
     private static readonly List<int[]> paramValueInfoList = new();
     private static readonly List<GPARAM.Param> allParamsList = new();
@@ -53,11 +59,6 @@ public partial class GParamStudio : Form
     private static DialogResult ShowQuestionDialog(string str)
     {
         return MessageBox.Show(str, @"Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-    }
-
-    private static void ShowInformationDialog(string str)
-    {
-        MessageBox.Show(str, @"Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
     private int ShowAddParamDialog()
@@ -137,7 +138,9 @@ public partial class GParamStudio : Form
         foreach (GPARAM.Group group in gparam.Groups)
         {
             int imageIndex = gparam.Groups.IndexOf(group);
-            TreeNode groupNode = new() { Name = group.Name2, Text = group.Name2, ImageIndex = imageIndex, SelectedImageIndex = imageIndex };
+            string? groupComment = commentsJson[group.Name2]?.ToString();
+            string groupName = !string.IsNullOrEmpty(groupComment) ? $"{group.Name2} - {groupComment}" : group.Name2;
+            TreeNode groupNode = new() { Name = group.Name2, Text = groupName, ImageIndex = imageIndex, SelectedImageIndex = imageIndex };
             if (group.Params.Count > 0)
             {
                 List<int> ids = new();
@@ -152,8 +155,10 @@ public partial class GParamStudio : Form
                 times = times.Distinct().ToList();
                 foreach (TreeNode? idNode in ids.Select(id => new TreeNode
                          {
-                             Text = $@"• ID: {id}", Name = id.ToString(),
-                             ImageIndex = groupNodeColors.Images.Count, SelectedImageIndex = groupNodeColors.Images.Count
+                             Text = $@"• ID: {id}",
+                             Name = id.ToString(),
+                             ImageIndex = groupNodeColors.Images.Count,
+                             SelectedImageIndex = groupNodeColors.Images.Count
                          }))
                 {
                     const float baseTime = 0;
@@ -163,7 +168,8 @@ public partial class GParamStudio : Form
                              {
                                  Text = $@"• {newTime.ToString("h:mm tt", CultureInfo.InvariantCulture)}",
                                  Name = time.ToString(CultureInfo.InvariantCulture),
-                                 ImageIndex = groupNodeColors.Images.Count, SelectedImageIndex = groupNodeColors.Images.Count
+                                 ImageIndex = groupNodeColors.Images.Count,
+                                 SelectedImageIndex = groupNodeColors.Images.Count
                              })
                     {
                         idNode.Nodes.Add(timeNode);
@@ -194,6 +200,7 @@ public partial class GParamStudio : Form
         groupsParamsContainer.Enabled = true;
         paramsBox.LabelEdit = true;
         PopulateGroupNodeColors();
+        ReadCommentsJson();
         LoadParams();
     }
 
@@ -597,6 +604,30 @@ public partial class GParamStudio : Form
         return isMouseWithinNodeBounds ? hoveredNode : null;
     }
 
+    private static void ReadCommentsJson()
+    {
+        try
+        {
+            commentsJson = JObject.Parse(File.ReadAllText(commentsJsonFilePath));
+        }
+        catch
+        {
+            WriteCommentsJson();
+        }
+    }
+
+    private static void WriteCommentsJson()
+    {
+        File.WriteAllText(commentsJsonFilePath, JsonConvert.SerializeObject(commentsJson, Formatting.Indented));
+    }
+
+    private void OnGroupNodeAssignComment(string groupName)
+    {
+        commentsJson[groupName] = ShowCommentDialog();
+        WriteCommentsJson();
+        LoadParams();
+    }
+
     private void OnMapAreaIdNodeAddTimeOfDay(TreeNode mapAreaIdNode)
     {
         string timeOfDayStr = ShowInputDialog("Enter a time of day:", "Add Time");
@@ -639,16 +670,16 @@ public partial class GParamStudio : Form
         LoadParams();
     }
 
-    private void OnParamNodeAssignComment(TreeNode paramNode)
+    private static string ShowCommentDialog()
     {
         string comment = ShowInputDialog("Enter a comment:", "Assign Comment");
-        if (string.IsNullOrEmpty(comment))
-        {
-            ShowInformationDialog("The comment cannot be empty.");
-            return;
-        }
+        return comment;
+    }
+
+    private void OnParamNodeAssignComment(TreeNode paramNode)
+    {
         int[] valueInfo = GetValueInfoFromParamValInfoList(paramNode.Nodes[0]);
-        gparam.Groups[valueInfo[0]].Comments[valueInfo[1]] = comment;
+        gparam.Groups[valueInfo[0]].Comments[valueInfo[1]] = ShowCommentDialog();
         LoadParams();
     }
 
@@ -672,12 +703,19 @@ public partial class GParamStudio : Form
         rightClickMenu.Show(treeView, e.X, e.Y);
     }
 
-    private void GroupsBoxParamIdNodeClick(object sender, MouseEventArgs e)
+    private void GroupsBoxRightClick(object sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Right) return;
-        TreeNode? mapAreaIdNode = GetHoveredNodeOnRightClick(groupsBox, e);
-        if (mapAreaIdNode is not { Level: 1 }) return;
-        ShowRightClickMenu(mapAreaIdNodeRightClickMenu, groupsBox, (_, _) => OnMapAreaIdNodeAddTimeOfDay(mapAreaIdNode), e);
+        TreeNode? treeNode = GetHoveredNodeOnRightClick(groupsBox, e);
+        switch (treeNode)
+        {
+            case { Level: 0 }:
+                ShowRightClickMenu(groupNodeRightClickMenu, groupsBox, (_, _) => OnGroupNodeAssignComment(treeNode.Name), e);
+                break;
+            case { Level: 1 }:
+                ShowRightClickMenu(mapAreaIdNodeRightClickMenu, groupsBox, (_, _) => OnMapAreaIdNodeAddTimeOfDay(treeNode), e);
+                break;
+        }
     }
 
     private void ParamsBox_MouseDown(object sender, MouseEventArgs e)

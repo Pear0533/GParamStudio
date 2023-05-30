@@ -137,3 +137,4 @@ D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GPa
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\WitchyFormats.pdb
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\System.Text.Encoding.CodePages.dll
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\Newtonsoft.Json.dll

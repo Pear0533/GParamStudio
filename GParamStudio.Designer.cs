@@ -60,6 +60,8 @@ namespace GParamStudio
             paramNodeRightClickMenu = new ContextMenuStrip(components);
             deleteParamToolStripMenuItem = new ToolStripMenuItem();
             changeCommentToolStripMenuItem = new ToolStripMenuItem();
+            groupNodeRightClickMenu = new ContextMenuStrip(components);
+            assignCommentToolStripMenuItem = new ToolStripMenuItem();
             ribbon.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)groupsParamsContainer).BeginInit();
             groupsParamsContainer.Panel1.SuspendLayout();
@@ -72,6 +74,7 @@ namespace GParamStudio
             mapAreaIdNodeRightClickMenu.SuspendLayout();
             paramsBoxAddParamRightClickMenu.SuspendLayout();
             paramNodeRightClickMenu.SuspendLayout();
+            groupNodeRightClickMenu.SuspendLayout();
             SuspendLayout();
             // 
             // ribbon
@@ -168,7 +171,7 @@ namespace GParamStudio
             groupsBox.TabIndex = 5;
             groupsBox.TreeState_dic = null;
             groupsBox.AfterSelect += GroupsBoxAfterSelect;
-            groupsBox.MouseDown += GroupsBoxParamIdNodeClick;
+            groupsBox.MouseDown += GroupsBoxRightClick;
             // 
             // groupNodeColors
             // 
@@ -336,6 +339,18 @@ namespace GParamStudio
             changeCommentToolStripMenuItem.Size = new Size(166, 22);
             changeCommentToolStripMenuItem.Text = "Assign Comment";
             // 
+            // groupNodeRightClickMenu
+            // 
+            groupNodeRightClickMenu.Items.AddRange(new ToolStripItem[] { assignCommentToolStripMenuItem });
+            groupNodeRightClickMenu.Name = "groupNodeRightClickMenu";
+            groupNodeRightClickMenu.Size = new Size(167, 26);
+            // 
+            // assignCommentToolStripMenuItem
+            // 
+            assignCommentToolStripMenuItem.Name = "assignCommentToolStripMenuItem";
+            assignCommentToolStripMenuItem.Size = new Size(166, 22);
+            assignCommentToolStripMenuItem.Text = "Assign Comment";
+            // 
             // GParamStudio
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -371,6 +386,7 @@ namespace GParamStudio
             mapAreaIdNodeRightClickMenu.ResumeLayout(false);
             paramsBoxAddParamRightClickMenu.ResumeLayout(false);
             paramNodeRightClickMenu.ResumeLayout(false);
+            groupNodeRightClickMenu.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -405,5 +421,7 @@ namespace GParamStudio
         private customTreeView paramsBox;
         private ToolStripMenuItem changeCommentToolStripMenuItem;
         private ImageList groupNodeColors;
+        private ContextMenuStrip groupNodeRightClickMenu;
+        private ToolStripMenuItem assignCommentToolStripMenuItem;
     }
 }
