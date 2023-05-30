@@ -571,7 +571,7 @@ public partial class GParamStudio : Form
         if (e.Node.Parent == null) e.CancelEdit = true;
     }
 
-    private static string ShowInputDialog(string text, string caption)
+    private static string? ShowInputDialog(string text, string caption)
     {
         Form prompt = new()
         {
@@ -623,14 +623,16 @@ public partial class GParamStudio : Form
 
     private void OnGroupNodeAssignComment(string groupName)
     {
-        commentsJson[groupName] = ShowCommentDialog();
+        string? comment = ShowCommentDialog();
+        if (comment == null) return;
+        commentsJson[groupName] = comment;
         WriteCommentsJson();
         LoadParams();
     }
 
     private void OnMapAreaIdNodeAddTimeOfDay(TreeNode mapAreaIdNode)
     {
-        string timeOfDayStr = ShowInputDialog("Enter a time of day:", "Add Time");
+        string? timeOfDayStr = ShowInputDialog("Enter a time of day:", "Add Time");
         if (timeOfDayStr == "") return;
         float.TryParse(timeOfDayStr, out float timeOfDay);
         List<GPARAM.Param>? paramList = gparam.Groups.ElementAtOrDefault(groupsBox.Nodes.IndexOf(mapAreaIdNode.Parent))?.Params;
@@ -670,16 +672,18 @@ public partial class GParamStudio : Form
         LoadParams();
     }
 
-    private static string ShowCommentDialog()
+    private static string? ShowCommentDialog()
     {
-        string comment = ShowInputDialog("Enter a comment:", "Assign Comment");
-        return comment;
+        string? comment = ShowInputDialog("Enter a comment:", "Assign Comment");
+        return string.IsNullOrEmpty(comment) ? null : comment;
     }
 
     private void OnParamNodeAssignComment(TreeNode paramNode)
     {
+        string? comment = ShowCommentDialog();
+        if (comment == null) return;
         int[] valueInfo = GetValueInfoFromParamValInfoList(paramNode.Nodes[0]);
-        gparam.Groups[valueInfo[0]].Comments[valueInfo[1]] = ShowCommentDialog();
+        gparam.Groups[valueInfo[0]].Comments[valueInfo[1]] = comment;
         LoadParams();
     }
 
@@ -722,8 +726,7 @@ public partial class GParamStudio : Form
     {
         if (e.Button != MouseButtons.Right) return;
         TreeNode? paramNode = GetHoveredNodeOnRightClick(paramsBox, e);
-        if (paramNode is not { Level: 0 }) ShowRightClickMenu(paramsBoxAddParamRightClickMenu, paramsBox, (_, _) => OnParamsBoxAddNewParam(), e);
-        else
+        if (paramNode is { Level: 0 })
         {
             ShowRightClickMenu(paramNodeRightClickMenu, paramsBox, (_, clickEventArgs) =>
             {
@@ -739,6 +742,7 @@ public partial class GParamStudio : Form
                 }
             }, e);
         }
+        else if (paramNode is not { Level: 1 }) ShowRightClickMenu(paramsBoxAddParamRightClickMenu, paramsBox, (_, _) => OnParamsBoxAddNewParam(), e);
     }
 
     private void ParamsBox_AfterSelect(object sender, TreeViewEventArgs e)
