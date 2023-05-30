@@ -760,7 +760,7 @@ public partial class GParamStudio : Form
 
     private void ParamsBox_MouseDown(object sender, MouseEventArgs e)
     {
-        if (e.Button != MouseButtons.Right) return;
+        if (e.Button != MouseButtons.Right || paramsBox.Nodes.Cast<TreeNode>().All(i => string.IsNullOrEmpty(i.Name))) return;
         TreeNode? paramNode = GetHoveredNodeOnRightClick(paramsBox, e);
         if (paramNode is { Level: 0 })
         {
@@ -780,7 +780,8 @@ public partial class GParamStudio : Form
                 }
             }, e);
         }
-        else if (paramNode is not { Level: 1 }) ShowRightClickMenu(paramsBoxAddParamRightClickMenu, paramsBox, (_, _) => OnParamsBoxAddNewParam(), e);
+        else if (paramNode is not { Level: 1 })
+            ShowRightClickMenu(paramsBoxAddParamRightClickMenu, paramsBox, (_, _) => OnParamsBoxAddNewParam(), e);
     }
 
     private void ParamsBox_AfterSelect(object sender, TreeViewEventArgs e)
