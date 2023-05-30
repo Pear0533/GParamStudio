@@ -131,6 +131,9 @@ public partial class GParamStudio : Form
 
     private void LoadParams()
     {
+        int groupNodeIndex = groupsBox.SelectedNode?.Parent?.Parent?.Index ?? 0;
+        int mapAreaIdNodeIndex = groupsBox.SelectedNode?.Parent?.Index ?? 0;
+        int timeNodeIndex = groupsBox.SelectedNode?.Index ?? 0;
         groupsBox.SaveTreeState();
         groupsBox.Nodes.Clear();
         paramsBox.Nodes.Clear();
@@ -180,6 +183,7 @@ public partial class GParamStudio : Form
             groupsBox.Nodes.Add(groupNode);
         }
         groupsBox.RestoreTreeState();
+        groupsBox.SelectedNode = groupsBox.Nodes[groupNodeIndex].Nodes[mapAreaIdNodeIndex].Nodes[timeNodeIndex];
     }
 
     private void OpenGPARAMFile()
