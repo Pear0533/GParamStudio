@@ -19,7 +19,7 @@ public partial class GParamStudio : Form
     private static TreeNode? prevSelectedNode;
     private static string gparamFileName = "";
     private static readonly string? rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-    private static readonly string commentsJsonFilePath = $"{rootPath}\\groupcomments.json";
+    private static readonly string commentsJsonFilePath = $"{rootPath}\\comments.json";
     private static JObject commentsJson = new();
     private static bool isGParamFileOpen;
     private static readonly List<int[]> paramValueInfoList = new();
@@ -131,6 +131,7 @@ public partial class GParamStudio : Form
 
     private void LoadParams()
     {
+        bool shouldRememberGroupsBoxState = groupsBox.SelectedNode != null;
         int groupNodeIndex = groupsBox.SelectedNode?.Parent?.Parent?.Index ?? 0;
         int mapAreaIdNodeIndex = groupsBox.SelectedNode?.Parent?.Index ?? 0;
         int timeNodeIndex = groupsBox.SelectedNode?.Index ?? 0;
@@ -142,8 +143,8 @@ public partial class GParamStudio : Form
         {
             int imageIndex = gparam.Groups.IndexOf(group);
             string? groupComment = commentsJson[group.Name2]?.ToString();
-            string groupName = !string.IsNullOrEmpty(groupComment) ? $"{group.Name2} - {groupComment}" : group.Name2;
-            TreeNode groupNode = new() { Name = group.Name2, Text = groupName, ImageIndex = imageIndex, SelectedImageIndex = imageIndex };
+            string groupDispName = !string.IsNullOrEmpty(groupComment) ? $"{group.Name2} - {groupComment}" : group.Name2;
+            TreeNode groupNode = new() { Name = group.Name2, Text = groupDispName, ImageIndex = imageIndex, SelectedImageIndex = imageIndex };
             if (group.Params.Count > 0)
             {
                 List<int> ids = new();
@@ -183,7 +184,8 @@ public partial class GParamStudio : Form
             groupsBox.Nodes.Add(groupNode);
         }
         groupsBox.RestoreTreeState();
-        groupsBox.SelectedNode = groupsBox.Nodes[groupNodeIndex].Nodes[mapAreaIdNodeIndex].Nodes[timeNodeIndex];
+        if (shouldRememberGroupsBoxState)
+            groupsBox.SelectedNode = groupsBox.Nodes[groupNodeIndex].Nodes[mapAreaIdNodeIndex].Nodes[timeNodeIndex];
     }
 
     private void OpenGPARAMFile()
@@ -242,18 +244,18 @@ public partial class GParamStudio : Form
                     int wantedValueID = int.Parse(idNode.Name);
                     float wantedTimeValue = float.Parse(timeNode.Name);
                     GPARAM.Group group = gparam.Groups[groupNode.Index];
-                    for (int i = 0; i < group.Params.Count; i++)
+                    foreach (GPARAM.Param param in group.Params)
                     {
-                        GPARAM.Param param = group.Params[i];
                         for (int j = 0; j < param.ValueIDs.Count; ++j)
                         {
                             int valueID = param.ValueIDs[j];
                             if (param.TimeOfDay == null) continue;
                             if (valueID != wantedValueID || !param.TimeOfDay[j].Equals(wantedTimeValue)) continue;
                             int shortNameIndex = param.Name1.IndexOf(param.Name2, StringComparison.Ordinal);
-                            string paramNodeName = shortNameIndex != -1 ? param.Name1[shortNameIndex..] : param.Name2;
-                            string paramComment = !string.IsNullOrEmpty(group.Comments.ElementAtOrDefault(i)) ? $" - {group.Comments.ElementAtOrDefault(i)}" : "";
-                            TreeNode paramNode = new() { Name = paramNodeName, Text = $@"{paramNodeName}{paramComment}" };
+                            string paramName = shortNameIndex != -1 ? param.Name1[shortNameIndex..] : param.Name2;
+                            string? paramComment = commentsJson[paramName]?.ToString();
+                            string paramDispName = !string.IsNullOrEmpty(paramComment) ? $"{paramName} - {paramComment}" : paramName;
+                            TreeNode paramNode = new() { Name = paramName, Text = paramDispName };
                             TreeNode valueNode = new() { Text = param.Values[j].ToString() };
                             paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), j });
                             paramNode.Nodes.Add(valueNode);
@@ -267,8 +269,8 @@ public partial class GParamStudio : Form
         paramsBox.RestoreTreeState();
         if (prevSelectedNode != null && prevSelectedNode.Nodes.Count > 0)
         {
-            TreeNode? matchingParamNode = paramsBox.Nodes.Find(prevSelectedNode.Text, false).FirstOrDefault();
-            if (matchingParamNode != null) paramsBox.SelectedNode = paramsBox.Nodes[prevSelectedNode.Text].Nodes[0];
+            TreeNode? matchingParamNode = paramsBox.Nodes.Find(prevSelectedNode.Name, false).FirstOrDefault();
+            if (matchingParamNode != null) paramsBox.SelectedNode = paramsBox.Nodes[prevSelectedNode.Name].Nodes[0];
         }
         if (isTimeNodeSelected && paramsBox.Nodes.Count > 0) return;
         paramsBox.Nodes.Clear();
@@ -441,6 +443,119 @@ public partial class GParamStudio : Form
         return (float)(degrees * (Math.PI / 180));
     }
 
+    private void ActivateAngleControl(TreeNode node, IReadOnlyList<int> valueInfo, IReadOnlyList<float> values)
+    {
+        int angleValue = ToDegrees(values[0]);
+        int altitudeValue = ToDegrees(values[1]);
+        AngleAltitudeSelector angleSelector = new()
+        {
+            Dock = DockStyle.Fill,
+            Angle = angleValue,
+            Altitude = altitudeValue
+        };
+        NumericUpDown angleBox = CreateNumBoxWithSetValue(angleValue, 1);
+        NumericUpDown altitudeBox = CreateNumBoxWithSetValue(altitudeValue, 1);
+
+        void AngleSelectorValueChanged()
+        {
+            Vector2 angle = new(ToRadians(angleSelector.Angle), ToRadians(angleSelector.Altitude));
+            angleBox.Value = angleSelector.Angle;
+            altitudeBox.Value = angleSelector.Altitude;
+            UpdateParamValueInfo(valueInfo, angle);
+            node.Text = angle.ToString();
+        }
+
+        angleSelector.AngleChanged += AngleSelectorValueChanged;
+        angleSelector.AltitudeChanged += AngleSelectorValueChanged;
+        angleBox.ValueChanged += (_, _) => { angleSelector.Angle = (int)angleBox.Value; };
+        altitudeBox.ValueChanged += (_, _) => { angleSelector.Altitude = (int)altitudeBox.Value; };
+        FlowLayoutPanel numBoxesContainer = new() { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown };
+        numBoxesContainer.Controls.Add(angleBox);
+        numBoxesContainer.Controls.Add(altitudeBox);
+        SplitContainer angleControlContainer = new() { Dock = DockStyle.Fill };
+        angleControlContainer.Panel1.Controls.Add(angleSelector);
+        angleControlContainer.Panel2.Controls.Add(numBoxesContainer);
+        propertiesPanel.Controls.Add(angleControlContainer);
+    }
+
+    private void ActivateColorWheelControl(TreeNode node, IReadOnlyList<int> valueInfo, IReadOnlyList<float> values)
+    {
+        ColorWheel wheel = new()
+        {
+            Dock = DockStyle.Fill,
+            Color = Color.FromArgb(
+                255, (int)(values[0] * 255), (int)(values[1] * 255), (int)(values[2] * 255))
+        };
+        ColorEditor editor = new() { Dock = DockStyle.Fill, Color = wheel.Color };
+        wheel.ColorChanged += (_, _) =>
+        {
+            Color color = wheel.Color;
+            Vector4 colorObj = new((float)(color.R / 255.0), (float)(color.G / 255.0), (float)(color.B / 255.0), values[3]);
+            editor.Color = wheel.Color;
+            UpdateParamValueInfo(valueInfo, colorObj);
+            node.Text = colorObj.ToString();
+        };
+        editor.ColorChanged += (_, _) => { wheel.Color = editor.Color; };
+        foreach (Control control in editor.Controls)
+        {
+            control.KeyDown += (_, e) =>
+            {
+                if (e.KeyCode == Keys.Enter) e.SuppressKeyPress = true;
+            };
+        }
+        SplitContainer colorControlContainer = new() { Dock = DockStyle.Fill };
+        colorControlContainer.Panel1.Controls.Add(wheel);
+        colorControlContainer.Panel2.Controls.Add(editor);
+        propertiesPanel.Controls.Add(colorControlContainer);
+    }
+
+    private void ActivateCheckboxControl(TreeNode node, IReadOnlyList<int> valueInfo, GPARAM.Param param, dynamic value)
+    {
+        CheckBox checkbox = new() { Size = propertiesPanel.Size with { Height = 30 }, Text = param.Name2, Checked = bool.Parse(value) };
+        checkbox.CheckStateChanged += (_, _) =>
+        {
+            UpdateParamValueInfo(valueInfo, checkbox.Checked);
+            node.Text = checkbox.Checked.ToString();
+        };
+        propertiesPanel.Controls.Add(checkbox);
+    }
+
+    private void ActivateNumberBoxControl(TreeNode node, IReadOnlyList<int> valueInfo, GPARAM.Param param, dynamic value)
+    {
+        NumericUpDown numBox = CreateNumBoxWithSetValue(decimal.Parse(value), (decimal)0.01);
+        numBox.ValueChanged += (_, _) =>
+        {
+            object convertedNumBoxVal = numBox.Value;
+            switch (param.Type)
+            {
+                case GPARAM.ParamType.Byte:
+                    convertedNumBoxVal = Convert.ToByte(convertedNumBoxVal);
+                    break;
+                case GPARAM.ParamType.Short:
+                    convertedNumBoxVal = Convert.ToInt16(convertedNumBoxVal);
+                    break;
+                case GPARAM.ParamType.IntA:
+                case GPARAM.ParamType.IntB:
+                    convertedNumBoxVal = Convert.ToInt32(convertedNumBoxVal);
+                    break;
+                case GPARAM.ParamType.Float:
+                    convertedNumBoxVal = Convert.ToSingle(convertedNumBoxVal);
+                    break;
+                case GPARAM.ParamType.BoolA:
+                case GPARAM.ParamType.BoolB:
+                case GPARAM.ParamType.Float2:
+                case GPARAM.ParamType.Float3:
+                case GPARAM.ParamType.Float4:
+                case GPARAM.ParamType.Byte4:
+                default:
+                    break;
+            }
+            UpdateParamValueInfo(valueInfo, convertedNumBoxVal);
+            node.Text = numBox.Value.ToString(CultureInfo.InvariantCulture);
+        };
+        propertiesPanel.Controls.Add(numBox);
+    }
+
     private void UpdateInteractiveControl(TreeNode node)
     {
         if (node.Parent == null) return;
@@ -452,114 +567,21 @@ public partial class GParamStudio : Form
         switch (param.Type)
         {
             case GPARAM.ParamType.Float2:
-                int angleValue = ToDegrees(values[0]);
-                int altitudeValue = ToDegrees(values[1]);
-                AngleAltitudeSelector angleSelector = new()
-                {
-                    Dock = DockStyle.Fill,
-                    Angle = angleValue,
-                    Altitude = altitudeValue
-                };
-                NumericUpDown angleBox = CreateNumBoxWithSetValue(angleValue, 1);
-                NumericUpDown altitudeBox = CreateNumBoxWithSetValue(altitudeValue, 1);
-
-                void AngleSelectorValueChanged()
-                {
-                    Vector2 angle = new(ToRadians(angleSelector.Angle), ToRadians(angleSelector.Altitude));
-                    angleBox.Value = angleSelector.Angle;
-                    altitudeBox.Value = angleSelector.Altitude;
-                    UpdateParamValueInfo(valueInfo, angle);
-                    node.Text = angle.ToString();
-                }
-
-                angleSelector.AngleChanged += AngleSelectorValueChanged;
-                angleSelector.AltitudeChanged += AngleSelectorValueChanged;
-                angleBox.ValueChanged += (_, _) => { angleSelector.Angle = (int)angleBox.Value; };
-                altitudeBox.ValueChanged += (_, _) => { angleSelector.Altitude = (int)altitudeBox.Value; };
-                FlowLayoutPanel numBoxesContainer = new() { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown };
-                numBoxesContainer.Controls.Add(angleBox);
-                numBoxesContainer.Controls.Add(altitudeBox);
-                SplitContainer angleControlContainer = new() { Dock = DockStyle.Fill };
-                angleControlContainer.Panel1.Controls.Add(angleSelector);
-                angleControlContainer.Panel2.Controls.Add(numBoxesContainer);
-                propertiesPanel.Controls.Add(angleControlContainer);
+                ActivateAngleControl(node, valueInfo, values);
                 break;
             case GPARAM.ParamType.Float4:
-                ColorWheel wheel = new()
-                {
-                    Dock = DockStyle.Fill,
-                    Color = Color.FromArgb(
-                        255, (int)(values[0] * 255), (int)(values[1] * 255), (int)(values[2] * 255))
-                };
-                ColorEditor editor = new() { Dock = DockStyle.Fill, Color = wheel.Color };
-                wheel.ColorChanged += (_, _) =>
-                {
-                    Color color = wheel.Color;
-                    Vector4 colorObj = new((float)(color.R / 255.0), (float)(color.G / 255.0), (float)(color.B / 255.0), values[3]);
-                    editor.Color = wheel.Color;
-                    UpdateParamValueInfo(valueInfo, colorObj);
-                    node.Text = colorObj.ToString();
-                };
-                editor.ColorChanged += (_, _) => { wheel.Color = editor.Color; };
-                foreach (Control control in editor.Controls)
-                {
-                    control.KeyDown += (_, e) =>
-                    {
-                        if (e.KeyCode == Keys.Enter) e.SuppressKeyPress = true;
-                    };
-                }
-                SplitContainer colorControlContainer = new() { Dock = DockStyle.Fill };
-                colorControlContainer.Panel1.Controls.Add(wheel);
-                colorControlContainer.Panel2.Controls.Add(editor);
-                propertiesPanel.Controls.Add(colorControlContainer);
+                ActivateColorWheelControl(node, valueInfo, values);
                 break;
             case GPARAM.ParamType.BoolA:
             case GPARAM.ParamType.BoolB:
-                CheckBox checkbox = new() { Size = propertiesPanel.Size with { Height = 30 }, Text = param.Name2, Checked = bool.Parse(value) };
-                checkbox.CheckStateChanged += (_, _) =>
-                {
-                    UpdateParamValueInfo(valueInfo, checkbox.Checked);
-                    node.Text = checkbox.Checked.ToString();
-                };
-                propertiesPanel.Controls.Add(checkbox);
+                ActivateCheckboxControl(node, valueInfo, param, value);
                 break;
             case GPARAM.ParamType.Byte:
             case GPARAM.ParamType.Short:
             case GPARAM.ParamType.IntA:
             case GPARAM.ParamType.IntB:
             case GPARAM.ParamType.Float:
-                NumericUpDown numBox = CreateNumBoxWithSetValue(decimal.Parse(value), (decimal)0.01);
-                numBox.ValueChanged += (_, _) =>
-                {
-                    object convertedNumBoxVal = numBox.Value;
-                    switch (param.Type)
-                    {
-                        case GPARAM.ParamType.Byte:
-                            convertedNumBoxVal = Convert.ToByte(convertedNumBoxVal);
-                            break;
-                        case GPARAM.ParamType.Short:
-                            convertedNumBoxVal = Convert.ToInt16(convertedNumBoxVal);
-                            break;
-                        case GPARAM.ParamType.IntA:
-                        case GPARAM.ParamType.IntB:
-                            convertedNumBoxVal = Convert.ToInt32(convertedNumBoxVal);
-                            break;
-                        case GPARAM.ParamType.Float:
-                            convertedNumBoxVal = Convert.ToSingle(convertedNumBoxVal);
-                            break;
-                        case GPARAM.ParamType.BoolA:
-                        case GPARAM.ParamType.BoolB:
-                        case GPARAM.ParamType.Float2:
-                        case GPARAM.ParamType.Float3:
-                        case GPARAM.ParamType.Float4:
-                        case GPARAM.ParamType.Byte4:
-                        default:
-                            break;
-                    }
-                    UpdateParamValueInfo(valueInfo, convertedNumBoxVal);
-                    node.Text = numBox.Value.ToString(CultureInfo.InvariantCulture);
-                };
-                propertiesPanel.Controls.Add(numBox);
+                ActivateNumberBoxControl(node, valueInfo, param, value);
                 break;
             case GPARAM.ParamType.Float3:
             case GPARAM.ParamType.Byte4:
@@ -625,23 +647,23 @@ public partial class GParamStudio : Form
         File.WriteAllText(commentsJsonFilePath, JsonConvert.SerializeObject(commentsJson, Formatting.Indented));
     }
 
-    private void AddOverrideGroupComment(string groupName, string comment)
+    private void AddOverrideComment(string nameKey, string comment)
     {
-        commentsJson[groupName] = comment;
+        commentsJson[nameKey] = comment;
         WriteCommentsJson();
         LoadParams();
     }
 
-    private void OnGroupNodeAssignComment(string groupName)
+    private void OnAssignComment(string nameKey)
     {
         string? comment = ShowCommentDialog();
         if (comment == null) return;
-        AddOverrideGroupComment(groupName, comment);
+        AddOverrideComment(nameKey, comment);
     }
 
-    private void OnGroupNodeClearComment(string groupName)
+    private void OnClearComment(string nameKey)
     {
-        AddOverrideGroupComment(groupName, "");
+        AddOverrideComment(nameKey, "");
     }
 
     private void OnMapAreaIdNodeAddTimeOfDay(TreeNode mapAreaIdNode)
@@ -692,25 +714,6 @@ public partial class GParamStudio : Form
         return string.IsNullOrEmpty(comment) ? null : comment;
     }
 
-    private void AddOverrideParamComment(TreeNode paramNode, string comment)
-    {
-        int[] valueInfo = GetValueInfoFromParamValInfoList(paramNode.Nodes[0]);
-        gparam.Groups[valueInfo[0]].Comments[valueInfo[1]] = comment;
-        LoadParams();
-    }
-
-    private void OnParamNodeAssignComment(TreeNode paramNode)
-    {
-        string? comment = ShowCommentDialog();
-        if (comment == null) return;
-        AddOverrideParamComment(paramNode, comment);
-    }
-
-    private void OnParamNodeClearComment(TreeNode paramNode)
-    {
-        AddOverrideParamComment(paramNode, "");
-    }
-
     private void OnParamNodeDeleteParam(TreeNode paramNode)
     {
         DialogResult result = ShowQuestionDialog("Are you sure you want to delete this param?");
@@ -748,10 +751,10 @@ public partial class GParamStudio : Form
                     switch (GetSelectedOptionIndex(groupNodeRightClickMenu, args))
                     {
                         case 0:
-                            OnGroupNodeAssignComment(treeNode.Name);
+                            OnAssignComment(treeNode.Name);
                             break;
                         case 1:
-                            OnGroupNodeClearComment(treeNode.Name);
+                            OnClearComment(treeNode.Name);
                             break;
                     }
                 }, e);
@@ -776,10 +779,10 @@ public partial class GParamStudio : Form
                         OnParamNodeDeleteParam(paramNode);
                         break;
                     case 1:
-                        OnParamNodeAssignComment(paramNode);
+                        OnAssignComment(paramNode.Name);
                         break;
                     case 2:
-                        OnParamNodeClearComment(paramNode);
+                        OnClearComment(paramNode.Name);
                         break;
                 }
             }, e);
