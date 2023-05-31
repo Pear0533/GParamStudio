@@ -253,9 +253,9 @@ public partial class GParamStudio : Form
                             if (valueID != wantedValueID || !param.TimeOfDay[j].Equals(wantedTimeValue)) continue;
                             int shortNameIndex = param.Name1.IndexOf(param.Name2, StringComparison.Ordinal);
                             string paramName = shortNameIndex != -1 ? param.Name1[shortNameIndex..] : param.Name2;
-                            string? paramComment = commentsJson[paramName]?.ToString();
+                            string? paramComment = commentsJson[param.Name1]?.ToString();
                             string paramDispName = !string.IsNullOrEmpty(paramComment) ? $"{paramName} - {paramComment}" : paramName;
-                            TreeNode paramNode = new() { Name = paramName, Text = paramDispName };
+                            TreeNode paramNode = new() { Name = param.Name1, Text = paramDispName };
                             TreeNode valueNode = new() { Text = param.Values[j].ToString() };
                             paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), j });
                             paramNode.Nodes.Add(valueNode);
