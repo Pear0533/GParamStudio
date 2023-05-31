@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "cU26WBBBP+3btDCM7n9PzliXgxFh567wZ826w2yxMkcHDr3X43KxGbqVrZQ8O0fdJWoZHGQ7/F6smOZy5+DY6g==",
+  "dgSpecHash": "vtXqX4X8vYerOnhieVzZQeVB6kJG3RXtWpm20b7A95l+I57yh3L2kzxR1oyWdolQn2UHFXH5MsK2H9GTLQDhLA==",
   "success": true,
-  "projectFilePath": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\GParamStudio\\GParamStudio.csproj",
+  "projectFilePath": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\GParamStudio.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Isaac Fisher\\.nuget\\packages\\cyotek.windows.forms.colorpicker\\1.7.2\\cyotek.windows.forms.colorpicker.1.7.2.nupkg.sha512",
     "C:\\Users\\Isaac Fisher\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
