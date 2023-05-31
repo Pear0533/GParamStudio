@@ -157,6 +157,7 @@ public partial class GParamStudio : Form
                 }
                 ids = ids.Distinct().ToList();
                 times = times.Distinct().ToList();
+                times.Sort();
                 foreach (TreeNode? idNode in ids.Select(id => new TreeNode
                          {
                              Text = $@"• ID: {id}",
