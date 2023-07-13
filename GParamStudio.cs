@@ -255,7 +255,7 @@ public partial class GParamStudio : Form
                             int shortNameIndex = param.Name1.IndexOf(param.Name2, StringComparison.Ordinal);
                             string paramName = shortNameIndex != -1 ? param.Name1[shortNameIndex..] : param.Name2;
                             string? paramComment = commentsJson[param.Name1]?.ToString();
-                            string paramDispName = !string.IsNullOrEmpty(paramComment) ? $"{paramName} - {paramComment}" : paramName;
+                            string paramDispName = $"{(!string.IsNullOrEmpty(paramComment) ? $"{paramName} - {paramComment}" : paramName)} ({param.Name1})";
                             TreeNode paramNode = new() { Name = param.Name1, Text = paramDispName };
                             TreeNode valueNode = new() { Text = param.Values[j].ToString() };
                             paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), j });
