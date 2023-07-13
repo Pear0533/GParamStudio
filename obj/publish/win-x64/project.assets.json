@@ -249,17 +249,21 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Isaac Fisher\\.nuget\\packages\\": {}
+    "C:\\Users\\Isaac Fisher\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\GParamStudio.csproj",
+      "projectUniqueName": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\GParamStudio.csproj",
       "projectName": "GParamStudio",
-      "projectPath": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\GParamStudio.csproj",
+      "projectPath": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\GParamStudio.csproj",
       "packagesPath": "C:\\Users\\Isaac Fisher\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\obj\\publish\\win-x64\\",
+      "outputPath": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\GParamStudio\\obj\\publish\\win-x64\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+      ],
       "configFilePaths": [
         "C:\\Users\\Isaac Fisher\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -319,7 +323,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {
