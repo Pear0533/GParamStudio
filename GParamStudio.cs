@@ -257,7 +257,7 @@ public partial class GParamStudio : Form
                             string? paramComment = commentsJson[param.Name1]?.ToString();
                             string paramDispName = $"{(!string.IsNullOrEmpty(paramComment) ? $"{paramName} - {paramComment}" : paramName)} ({param.Name1})";
                             TreeNode paramNode = new() { Name = param.Name1, Text = paramDispName };
-                            TreeNode valueNode = new() { Text = param.Values[j].ToString() };
+                            TreeNode valueNode = new() { Text = Convert.ToString(param.Values[j].ToString(), CultureInfo.InvariantCulture) };
                             paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), j });
                             paramNode.Nodes.Add(valueNode);
                             paramsBox.Nodes.Add(paramNode);
@@ -305,7 +305,7 @@ public partial class GParamStudio : Form
 
     private static float[] GetSplitValuesFromValueString(dynamic value)
     {
-        string[] splitNewValue = CultureInfo.CurrentCulture.Equals(new CultureInfo("pt-PT")) ? value.split(".") : value.Split(",");
+        string[] splitNewValue = value.Split(",");
         try
         {
             float value1 = float.Parse(splitNewValue.ElementAtOrDefault(0) ?? "0");
