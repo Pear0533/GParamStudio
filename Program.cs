@@ -1,9 +1,12 @@
+using System.Globalization;
+
 namespace GParamStudio
 {
     internal static class Program
     {
         public static GParamStudio window = new();
         public static string windowTitle = "GParam Studio";
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -12,6 +15,7 @@ namespace GParamStudio
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
             ApplicationConfiguration.Initialize();
             window.Text = windowTitle;
             Application.Run(window);

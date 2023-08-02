@@ -1,4 +1,4 @@
-using System.Globalization;
+ï»¿using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using AngleAltitudeControls;
@@ -160,7 +160,7 @@ public partial class GParamStudio : Form
                 times.Sort();
                 foreach (TreeNode? idNode in ids.Select(id => new TreeNode
                          {
-                             Text = $@"• ID: {id}",
+                             Text = $@"â€¢ ID: {id}",
                              Name = id.ToString(),
                              ImageIndex = groupNodeColors.Images.Count,
                              SelectedImageIndex = groupNodeColors.Images.Count
@@ -171,7 +171,7 @@ public partial class GParamStudio : Form
                              let newTime = new DateTime(TimeSpan.FromHours(baseTime + time).Ticks)
                              select new TreeNode
                              {
-                                 Text = $@"• {newTime.ToString("h:mm tt", CultureInfo.InvariantCulture)}",
+                                 Text = $@"â€¢ {newTime.ToString("h:mm tt", CultureInfo.InvariantCulture)}",
                                  Name = time.ToString(CultureInfo.InvariantCulture),
                                  ImageIndex = groupNodeColors.Images.Count,
                                  SelectedImageIndex = groupNodeColors.Images.Count
@@ -257,7 +257,7 @@ public partial class GParamStudio : Form
                             string? paramComment = commentsJson[param.Name1]?.ToString();
                             string paramDispName = $"{(!string.IsNullOrEmpty(paramComment) ? $"{paramName} - {paramComment}" : paramName)} ({param.Name1})";
                             TreeNode paramNode = new() { Name = param.Name1, Text = paramDispName };
-                            TreeNode valueNode = new() { Text = string.Format(CultureInfo.InvariantCulture, @"{0}", param.Values[j]) };
+                            TreeNode valueNode = new() { Text = param.Values[j].ToString() };
                             paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), j });
                             paramNode.Nodes.Add(valueNode);
                             paramsBox.Nodes.Add(paramNode);
@@ -305,13 +305,13 @@ public partial class GParamStudio : Form
 
     private static float[] GetSplitValuesFromValueString(dynamic value)
     {
-        string[] splitNewValue = value.Split(",");
+        string[] splitNewValue = CultureInfo.CurrentCulture.Equals(new CultureInfo("pt-PT")) ? value.split(".") : value.Split(",");
         try
         {
-            float value1 = float.Parse(splitNewValue.ElementAtOrDefault(0) ?? "0", CultureInfo.InvariantCulture);
-            float value2 = float.Parse(splitNewValue.ElementAtOrDefault(1) ?? "0", CultureInfo.InvariantCulture);
-            float value3 = float.Parse(splitNewValue.ElementAtOrDefault(2) ?? "0", CultureInfo.InvariantCulture);
-            float value4 = float.Parse(splitNewValue.ElementAtOrDefault(3) ?? "0", CultureInfo.InvariantCulture);
+            float value1 = float.Parse(splitNewValue.ElementAtOrDefault(0) ?? "0");
+            float value2 = float.Parse(splitNewValue.ElementAtOrDefault(1) ?? "0");
+            float value3 = float.Parse(splitNewValue.ElementAtOrDefault(2) ?? "0");
+            float value4 = float.Parse(splitNewValue.ElementAtOrDefault(3) ?? "0");
             return new[] { value1, value2, value3, value4 };
         }
         catch
