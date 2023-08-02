@@ -257,7 +257,7 @@ public partial class GParamStudio : Form
                             string? paramComment = commentsJson[param.Name1]?.ToString();
                             string paramDispName = $"{(!string.IsNullOrEmpty(paramComment) ? $"{paramName} - {paramComment}" : paramName)} ({param.Name1})";
                             TreeNode paramNode = new() { Name = param.Name1, Text = paramDispName };
-                            TreeNode valueNode = new() { Text = param.Values[j].ToString() };
+                            TreeNode valueNode = new() { Text = string.Format(CultureInfo.InvariantCulture, @"{0}", param.Values[j]) };
                             paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), j });
                             paramNode.Nodes.Add(valueNode);
                             paramsBox.Nodes.Add(paramNode);
@@ -308,10 +308,10 @@ public partial class GParamStudio : Form
         string[] splitNewValue = value.Split(",");
         try
         {
-            float value1 = float.Parse(splitNewValue.ElementAtOrDefault(0) ?? "0");
-            float value2 = float.Parse(splitNewValue.ElementAtOrDefault(1) ?? "0");
-            float value3 = float.Parse(splitNewValue.ElementAtOrDefault(2) ?? "0");
-            float value4 = float.Parse(splitNewValue.ElementAtOrDefault(3) ?? "0");
+            float value1 = float.Parse(splitNewValue.ElementAtOrDefault(0) ?? "0", CultureInfo.InvariantCulture);
+            float value2 = float.Parse(splitNewValue.ElementAtOrDefault(1) ?? "0", CultureInfo.InvariantCulture);
+            float value3 = float.Parse(splitNewValue.ElementAtOrDefault(2) ?? "0", CultureInfo.InvariantCulture);
+            float value4 = float.Parse(splitNewValue.ElementAtOrDefault(3) ?? "0", CultureInfo.InvariantCulture);
             return new[] { value1, value2, value3, value4 };
         }
         catch
