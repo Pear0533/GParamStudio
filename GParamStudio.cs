@@ -257,7 +257,7 @@ public partial class GParamStudio : Form
                             string? paramComment = commentsJson[param.Name1]?.ToString();
                             string paramDispName = $"{(!string.IsNullOrEmpty(paramComment) ? $"{paramName} - {paramComment}" : paramName)} ({param.Name1})";
                             TreeNode paramNode = new() { Name = param.Name1, Text = paramDispName };
-                            TreeNode valueNode = new() { Text = Convert.ToString(param.Values[j].ToString(), CultureInfo.InvariantCulture) };
+                            TreeNode valueNode = new() { Text = param.Values[j].ToString() };
                             paramValueInfoList.Add(new[] { groupNode.Index, group.Params.IndexOf(param), j });
                             paramNode.Nodes.Add(valueNode);
                             paramsBox.Nodes.Add(paramNode);
