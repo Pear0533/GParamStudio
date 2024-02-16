@@ -265,6 +265,21 @@ public partial class GParamStudio : Form
         }
     }
 
+    private void UpdateParamValueInfo(IReadOnlyList<int> valueInfo, object newValue)
+    {
+        if (applyMassEditCheckbox.Checked)
+        {
+            int mapAreaId = gparam.Groups[valueInfo[0]].Params[valueInfo[1]].ValueIDs[valueInfo[2]];
+            for (var i = 0; i < gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values.Count; i++)
+            {
+                if (affectAllMapAreasCheckbox.Checked
+                    || gparam.Groups[valueInfo[0]].Params[valueInfo[1]].ValueIDs[i] == mapAreaId)
+                    gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values[i] = newValue;
+            }
+        }
+        else gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values[valueInfo[2]] = newValue;
+    }
+
     private void ParamsBoxAfterLabelEdit(object sender, NodeLabelEditEventArgs e)
     {
         dynamic newValue = GetStringFromParamValue(e.Label is null or "" ? e.Node.Text : e.Label);
@@ -286,7 +301,7 @@ public partial class GParamStudio : Form
                 GPARAM.ParamType.Float => float.Parse(newValue),
                 _ => 0
             };
-            gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values[valueInfo[2]] = newValue;
+            UpdateParamValueInfo(valueInfo, newValue);
             e.CancelEdit = true;
             e.Node.Text = newValue.ToString();
             UpdateInteractiveControl(e.Node);
@@ -345,8 +360,12 @@ public partial class GParamStudio : Form
     {
         var numBox = new NumericUpDown
         {
-            Size = new Size(120, 30), Increment = increment, DecimalPlaces = 2, Minimum = decimal.MinValue,
-            Maximum = decimal.MaxValue, Value = value
+            Size = new Size(120, 30),
+            Increment = increment,
+            DecimalPlaces = 2,
+            Minimum = decimal.MinValue,
+            Maximum = decimal.MaxValue,
+            Value = value
         };
         numBox.KeyDown += (_, e) =>
         {
@@ -380,7 +399,9 @@ public partial class GParamStudio : Form
                 int altitudeValue = ToDegrees(values[1]);
                 var angleSelector = new AngleAltitudeSelector
                 {
-                    Dock = DockStyle.Fill, Angle = angleValue, Altitude = altitudeValue
+                    Dock = DockStyle.Fill,
+                    Angle = angleValue,
+                    Altitude = altitudeValue
                 };
                 NumericUpDown angleBox = CreateNumBoxWithSetValue(angleValue, 1);
                 NumericUpDown altitudeBox = CreateNumBoxWithSetValue(altitudeValue, 1);
@@ -390,7 +411,7 @@ public partial class GParamStudio : Form
                     var angle = new Vector2(ToRadians(angleSelector.Angle), ToRadians(angleSelector.Altitude));
                     angleBox.Value = angleSelector.Angle;
                     altitudeBox.Value = angleSelector.Altitude;
-                    gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values[valueInfo[2]] = angle;
+                    UpdateParamValueInfo(valueInfo, angle);
                     node.Text = angle.ToString();
                 }
 
@@ -409,7 +430,8 @@ public partial class GParamStudio : Form
             case GPARAM.ParamType.Float4:
                 var wheel = new ColorWheel
                 {
-                    Dock = DockStyle.Fill, Color = Color.FromArgb(
+                    Dock = DockStyle.Fill,
+                    Color = Color.FromArgb(
                         255, (int)(values[0] * 255), (int)(values[1] * 255), (int)(values[2] * 255))
                 };
                 var editor = new ColorEditor { Dock = DockStyle.Fill, Color = wheel.Color };
@@ -418,7 +440,7 @@ public partial class GParamStudio : Form
                     Color color = wheel.Color;
                     var colorObj = new Vector4((float)(color.R / 255.0), (float)(color.G / 255.0), (float)(color.B / 255.0), values[3]);
                     editor.Color = wheel.Color;
-                    gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values[valueInfo[2]] = colorObj;
+                    UpdateParamValueInfo(valueInfo, colorObj);
                     node.Text = colorObj.ToString();
                 };
                 editor.ColorChanged += (_, _) => { wheel.Color = editor.Color; };
@@ -439,7 +461,7 @@ public partial class GParamStudio : Form
                 var checkbox = new CheckBox { Size = propertiesPanel.Size with { Height = 30 }, Text = param.Name2, Checked = bool.Parse(value) };
                 checkbox.CheckStateChanged += (_, _) =>
                 {
-                    gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values[valueInfo[2]] = checkbox.Checked;
+                    UpdateParamValueInfo(valueInfo, checkbox.Checked);
                     node.Text = checkbox.Checked.ToString();
                 };
                 propertiesPanel.Controls.Add(checkbox);
@@ -477,7 +499,7 @@ public partial class GParamStudio : Form
                         default:
                             break;
                     }
-                    gparam.Groups[valueInfo[0]].Params[valueInfo[1]].Values[valueInfo[2]] = convertedNumBoxVal;
+                    UpdateParamValueInfo(valueInfo, convertedNumBoxVal);
                     node.Text = numBox.Value.ToString(CultureInfo.InvariantCulture);
                 };
                 propertiesPanel.Controls.Add(numBox);

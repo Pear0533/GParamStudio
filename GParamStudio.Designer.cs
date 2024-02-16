@@ -49,6 +49,8 @@ namespace GParamStudio
             this.label3 = new System.Windows.Forms.Label();
             this.propertiesPanel = new System.Windows.Forms.Panel();
             this.versionStr = new System.Windows.Forms.Label();
+            this.applyMassEditCheckbox = new System.Windows.Forms.CheckBox();
+            this.affectAllMapAreasCheckbox = new System.Windows.Forms.CheckBox();
             this.copyrightInfoStr = new System.Windows.Forms.Label();
             this.mapAreaIdNodeRightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addNewTimeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -260,11 +262,23 @@ namespace GParamStudio
             this.versionStr.AutoSize = true;
             this.versionStr.BackColor = System.Drawing.SystemColors.Control;
             this.versionStr.ForeColor = System.Drawing.Color.DarkGray;
-            this.versionStr.Location = new System.Drawing.Point(664, 24);
+            this.versionStr.Location = new System.Drawing.Point(680, 24);
             this.versionStr.Name = "versionStr";
             this.versionStr.Size = new System.Drawing.Size(48, 15);
             this.versionStr.TabIndex = 8;
             this.versionStr.Text = "Version:";
+            //
+            // applyMassEditCheckbox
+            //
+            this.applyMassEditCheckbox.Text = "Apply Mass Edit";
+            this.applyMassEditCheckbox.Width = 115;
+            this.applyMassEditCheckbox.Location = new Point(685, 2);
+            //
+            // affectAllMapAreasCheckbox
+            //
+            this.affectAllMapAreasCheckbox.Text = "Affect All Map Areas";
+            this.affectAllMapAreasCheckbox.Width = 155;
+            this.affectAllMapAreasCheckbox.Location = new Point(800, 2);
             // 
             // copyrightInfoStr
             // 
@@ -272,7 +286,7 @@ namespace GParamStudio
             this.copyrightInfoStr.AutoSize = true;
             this.copyrightInfoStr.BackColor = System.Drawing.SystemColors.Control;
             this.copyrightInfoStr.ForeColor = System.Drawing.Color.DarkGray;
-            this.copyrightInfoStr.Location = new System.Drawing.Point(746, 24);
+            this.copyrightInfoStr.Location = new System.Drawing.Point(761, 24);
             this.copyrightInfoStr.Name = "copyrightInfoStr";
             this.copyrightInfoStr.Size = new System.Drawing.Size(174, 15);
             this.copyrightInfoStr.TabIndex = 7;
@@ -323,6 +337,8 @@ namespace GParamStudio
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(944, 450);
             this.Controls.Add(this.versionStr);
+            this.Controls.Add(this.applyMassEditCheckbox);
+            this.Controls.Add(this.affectAllMapAreasCheckbox);
             this.Controls.Add(this.copyrightInfoStr);
             this.Controls.Add(this.groupsParamsContainer);
             this.Controls.Add(this.ribbon);
@@ -372,6 +388,8 @@ namespace GParamStudio
         private Label label3;
         private ToolStripMenuItem saveAsToolStripMenuItem;
         private Label versionStr;
+        private CheckBox applyMassEditCheckbox;
+        private CheckBox affectAllMapAreasCheckbox;
         private ContextMenuStrip mapAreaIdNodeRightClickMenu;
         private ToolStripMenuItem addNewTimeToolStripMenuItem;
         private ContextMenuStrip paramsBoxAddParamRightClickMenu;
