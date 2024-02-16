@@ -511,32 +511,65 @@ public partial class GParamStudio : Form
         return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
     }
 
+    private static TreeNode? GetHoveredNodeOnRightClick(TreeView treeView, MouseEventArgs e)
+    {
+        if (e.Button != MouseButtons.Right) return null;
+        TreeNode? hoveredNode = treeView.GetNodeAt(e.X, e.Y);
+        return hoveredNode;
+    }
+
+    // NOTE: RESTORE TREE VIEW STATE
+
+    private void OnMapAreaIdNodeRightClick(TreeNode mapAreaIdNode)
+    {
+        // NOTE: ELIMINATE REDUNDANT TIME NODES
+        string timeOfDayStr = ShowInputDialog("Enter a time of day:", "Add Time");
+        if (timeOfDayStr == "") return;
+        float.TryParse(timeOfDayStr, out float timeOfDay);
+        List<GPARAM.Param>? paramList = gparam.Groups.ElementAtOrDefault(groupsBox.Nodes.IndexOf(mapAreaIdNode.Parent))?.Params;
+        if (paramList == null) return;
+        foreach (GPARAM.Param param in paramList)
+        {
+            param.TimeOfDay.Add(timeOfDay);
+            param.ValueIDs.Add(int.Parse(mapAreaIdNode.Name));
+            param.Values.Add(param.Values[^1]);
+        }
+        LoadParams();
+    }
+
+    private void OnParamNodeRightClick(TreeNode paramNode)
+    {
+        // NOTE: RESTORE ORDER OF MAP AREA ID NODES
+        DialogResult result = ShowQuestionDialog("Are you sure you want to delete this param?");
+        if (result != DialogResult.Yes) return;
+        int[] valueInfo = GetValueInfoFromParamValInfoList(paramNode.Nodes[0]);
+        GPARAM.Param param = gparam.Groups[valueInfo[0]].Params[valueInfo[1]];
+        param.TimeOfDay.RemoveAt(valueInfo[2]);
+        param.ValueIDs.RemoveAt(valueInfo[2]);
+        param.Values.RemoveAt(valueInfo[2]);
+        LoadParams();
+    }
+
+    private static void ShowHoveredNodeRightClickMenu(ToolStripDropDown rightClickMenu, TreeView treeView, TreeNode hoveredNode, ToolStripItemClickedEventHandler clickEvent,
+        MouseEventArgs e)
+    {
+        treeView.SelectedNode = hoveredNode;
+        rightClickMenu.Closed += (_, _) => { rightClickMenu.ItemClicked -= clickEvent; };
+        rightClickMenu.ItemClicked += clickEvent;
+        rightClickMenu.Show(treeView, e.X, e.Y);
+    }
+
     private void GroupsBoxParamIdNodeClick(object sender, MouseEventArgs e)
     {
-        if (e.Button != MouseButtons.Right) return;
-        TreeNode paramIdNode = groupsBox.GetNodeAt(e.X, e.Y);
-        if (paramIdNode.Level != 1) return;
+        TreeNode? mapAreaIdNode = GetHoveredNodeOnRightClick(groupsBox, e);
+        if (mapAreaIdNode is not { Level: 1 }) return;
+        ShowHoveredNodeRightClickMenu(mapAreaIdNodeRightClickMenu, groupsBox, mapAreaIdNode, (_, _) => OnMapAreaIdNodeRightClick(mapAreaIdNode), e);
+    }
 
-        void OnParamIdNodeRightClick(object? _, ToolStripItemClickedEventArgs itemClickEvent)
-        {
-            if (itemClickEvent.ClickedItem != paramIdNodeRightClickMenu.Items[0]) return;
-            string timeOfDayStr = ShowInputDialog("Enter a time of day:", "Add Time of Day");
-            if (timeOfDayStr == "") return;
-            float.TryParse(timeOfDayStr, out float timeOfDay);
-            foreach (GPARAM.Param param in gparam.Groups[groupsBox.Nodes.IndexOf(paramIdNode.Parent)].Params)
-            {
-                param.TimeOfDay.Add(timeOfDay);
-                param.ValueIDs.Add(int.Parse(paramIdNode.Name));
-                param.Values.Add(param.Values[^1]);
-            }
-            LoadParams();
-            TreeNode groupNode = groupsBox.Nodes.Find(paramIdNode.Parent.Name, false)[0];
-            groupNode.Expand();
-            groupNode.Nodes.Find(paramIdNode.Name, false)[0].Expand();
-            paramIdNodeRightClickMenu.ItemClicked -= OnParamIdNodeRightClick;
-        }
-
-        paramIdNodeRightClickMenu.ItemClicked += OnParamIdNodeRightClick;
-        paramIdNodeRightClickMenu.Show(groupsBox, e.X, e.Y);
+    private void ParamsBox_MouseDown(object sender, MouseEventArgs e)
+    {
+        TreeNode? paramNode = GetHoveredNodeOnRightClick(paramsBox, e);
+        if (paramNode is not { Level: 0 }) return;
+        ShowHoveredNodeRightClickMenu(paramNodeRightClickMenu, paramsBox, paramNode, (_, _) => OnParamNodeRightClick(paramNode), e);
     }
 }

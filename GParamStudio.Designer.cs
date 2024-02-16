@@ -48,8 +48,12 @@
             this.propertiesPanel = new System.Windows.Forms.Panel();
             this.versionStr = new System.Windows.Forms.Label();
             this.copyrightInfoStr = new System.Windows.Forms.Label();
-            this.paramIdNodeRightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mapAreaIdNodeRightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addNewTimeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.paramsBoxAddParamRightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addNewParamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.paramNodeRightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.deleteParamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ribbon.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupsParamsContainer)).BeginInit();
             this.groupsParamsContainer.Panel1.SuspendLayout();
@@ -59,7 +63,9 @@
             this.paramsPropertiesContainer.Panel1.SuspendLayout();
             this.paramsPropertiesContainer.Panel2.SuspendLayout();
             this.paramsPropertiesContainer.SuspendLayout();
-            this.paramIdNodeRightClickMenu.SuspendLayout();
+            this.mapAreaIdNodeRightClickMenu.SuspendLayout();
+            this.paramsBoxAddParamRightClickMenu.SuspendLayout();
+            this.paramNodeRightClickMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // ribbon
@@ -209,6 +215,7 @@
             this.paramsBox.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.ParamsBoxAfterLabelEdit);
             this.paramsBox.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.ParamsBoxNodeMouseClick);
             this.paramsBox.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.ParamsBoxNodeMouseDoubleClick);
+            this.paramsBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ParamsBox_MouseDown);
             // 
             // label2
             // 
@@ -266,16 +273,42 @@
             // 
             // paramIdNodeRightClickMenu
             // 
-            this.paramIdNodeRightClickMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mapAreaIdNodeRightClickMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addNewTimeToolStripMenuItem});
-            this.paramIdNodeRightClickMenu.Name = "paramIdNodeRightClickMenu";
-            this.paramIdNodeRightClickMenu.Size = new System.Drawing.Size(163, 26);
+            this.mapAreaIdNodeRightClickMenu.Name = "mapAreaIdNodeRightClickMenu";
+            this.mapAreaIdNodeRightClickMenu.Size = new System.Drawing.Size(163, 26);
             // 
             // addNewTimeToolStripMenuItem
             // 
             this.addNewTimeToolStripMenuItem.Name = "addNewTimeToolStripMenuItem";
             this.addNewTimeToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.addNewTimeToolStripMenuItem.Text = "Add Time of Day";
+            // 
+            // paramsBoxAddParamRightClickMenu
+            // 
+            this.paramsBoxAddParamRightClickMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addNewParamToolStripMenuItem});
+            this.paramsBoxAddParamRightClickMenu.Name = "paramsBoxAddParamRightClickMenu";
+            this.paramsBoxAddParamRightClickMenu.Size = new System.Drawing.Size(161, 26);
+            // 
+            // addNewParamToolStripMenuItem
+            // 
+            this.addNewParamToolStripMenuItem.Name = "addNewParamToolStripMenuItem";
+            this.addNewParamToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.addNewParamToolStripMenuItem.Text = "Add New Param";
+            // 
+            // paramsBoxDeleteParamRightClickMenu
+            // 
+            this.paramNodeRightClickMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteParamToolStripMenuItem});
+            this.paramNodeRightClickMenu.Name = "paramNodeRightClickMenu";
+            this.paramNodeRightClickMenu.Size = new System.Drawing.Size(181, 48);
+            // 
+            // deleteParamToolStripMenuItem
+            // 
+            this.deleteParamToolStripMenuItem.Name = "deleteParamToolStripMenuItem";
+            this.deleteParamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteParamToolStripMenuItem.Text = "Delete Param";
             // 
             // GParamStudio
             // 
@@ -305,7 +338,9 @@
             this.paramsPropertiesContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.paramsPropertiesContainer)).EndInit();
             this.paramsPropertiesContainer.ResumeLayout(false);
-            this.paramIdNodeRightClickMenu.ResumeLayout(false);
+            this.mapAreaIdNodeRightClickMenu.ResumeLayout(false);
+            this.paramsBoxAddParamRightClickMenu.ResumeLayout(false);
+            this.paramNodeRightClickMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -331,7 +366,11 @@
         private Label label3;
         private ToolStripMenuItem saveAsToolStripMenuItem;
         private Label versionStr;
-        private ContextMenuStrip paramIdNodeRightClickMenu;
+        private ContextMenuStrip mapAreaIdNodeRightClickMenu;
         private ToolStripMenuItem addNewTimeToolStripMenuItem;
+        private ContextMenuStrip paramsBoxAddParamRightClickMenu;
+        private ToolStripMenuItem addNewParamToolStripMenuItem;
+        private ContextMenuStrip paramNodeRightClickMenu;
+        private ToolStripMenuItem deleteParamToolStripMenuItem;
     }
 }

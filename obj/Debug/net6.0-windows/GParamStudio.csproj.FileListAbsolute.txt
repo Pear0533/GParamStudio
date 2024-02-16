@@ -103,3 +103,31 @@ D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GPa
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.genruntimeconfig.cache
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\ref\GParamStudio.dll
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\icon.ico
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\GParamStudio.exe
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\icon.ico
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\bhd5_decrypt_rust.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\memory.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\oo2core_6_win64.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\GParamStudio.deps.json
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\GParamStudio.runtimeconfig.json
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\GParamStudio.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\GParamStudio.pdb
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\Cyotek.Windows.Forms.ColorPicker.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\AngleAltitudeControls.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\SoulsFormats.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\SoulsFormats.pdb
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\bin\Debug\net6.0-windows\SoulsFormats.xml
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.csproj.AssemblyReference.cache
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.GParamStudio.resources
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.Properties.Resources.resources
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.csproj.GenerateResource.cache
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.AssemblyInfoInputs.cache
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.AssemblyInfo.cs
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.csproj.CoreCompileInputs.cache
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.csproj.CopyComplete
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\refint\GParamStudio.dll
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.pdb
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\GParamStudio.genruntimeconfig.cache
+C:\Users\Isaac Fisher\Downloads\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\GParamStudio\GParamStudio\obj\Debug\net6.0-windows\ref\GParamStudio.dll
