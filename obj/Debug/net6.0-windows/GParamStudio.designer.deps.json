@@ -1,0 +1,28 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "Cyotek.Windows.Forms.ColorPicker/1.7.2": {
+        "runtime": {
+          "lib/net35/Cyotek.Windows.Forms.ColorPicker.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.7.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Cyotek.Windows.Forms.ColorPicker/1.7.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-TMOpL/n14jPk7vO3gqaM7NppBUZWe4oxVh5hCiw6gt6k3GXErshmJ1JlAluAcHkjTnbALnYZXbYStdo4WDk9zQ==",
+      "path": "cyotek.windows.forms.colorpicker/1.7.2",
+      "hashPath": "cyotek.windows.forms.colorpicker.1.7.2.nupkg.sha512"
+    }
+  }
+}
